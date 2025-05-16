@@ -1,0 +1,15 @@
+# Nextflow and workflow-related
+work/
+.nf.cache/
+.nextflow*
+
+# Folders with large data
+results/
+data/
+
+# Logs
+slurm-logs/
+
+
+
+

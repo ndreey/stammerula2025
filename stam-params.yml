@@ -1,0 +1,45 @@
+#########################################################################
+############################ Parameters #################################
+#########################################################################
+
+# Executor params
+slurm:
+  project: "naiss2025-22-494"
+
+# Result directory base params
+res:
+  qc: "results/00-QC"
+  trim: "results/01-trimmed"
+
+# Process params
+fastqc_raw:
+  input: "data/sr-raw/*.fastq.gz"
+
+fastqc_ccs:
+  input: "data/hifi-ccs-raw/*.fastq.gz"
+
+trim:
+  input: "data/sr-raw/*_R{1,2}_001.fastq.gz"
+  avg_qual: 20
+  len_req: 36
+
+
+
+
+
+#########################################################################
+########################## Singularity Images ###########################
+#########################################################################
+# Images are created through seqera (https://seqera.io/)
+# QC: Initial read processing and quality control (created 2025-05-15)
+#   - FastQC    v0.12.1
+#   - MultiQC   v1.28
+#   - fastp     v0.24.1
+#   - pigz      v2.8
+#
+#
+#
+#########################################################################
+
+images:
+  QC: "oras://community.wave.seqera.io/library/fastp_fastqc_multiqc_pigz:7770390cf9390aae"
