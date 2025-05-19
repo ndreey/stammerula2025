@@ -2,36 +2,38 @@
 
 process TRIM {
 
-    tag "${sample_id}"
+  label "trim"
 
-    publishDir params.res.trim, mode: 'symlink'
+  tag "${sample_id}"
 
-    container params.images.QC
+  publishDir params.res.trim, mode: 'symlink'
 
-    input:
-    tuple val(sample_id), path(read1), path(read2)
+  container params.images.QC
 
-    output:
-    tuple val(sample_id),
-          path("${sample_id}_R1_trimmed.fastq.gz"),
-          path("${sample_id}_R2_trimmed.fastq.gz"),
-          path("${sample_id}-fastp.html"),
-          path("${sample_id}-fastp.json")
+  input:
+  tuple val(sample_id), path(read1), path(read2)
 
-    script:
-    """
-    fastp \
-      --in1 ${read1} \
-      --in2 ${read2} \
-      --out1 ${sample_id}_R1_trimmed.fastq.gz \
-      --out2 ${sample_id}_R2_trimmed.fastq.gz \
-      --html ${sample_id}-fastp.html \
-      --json ${sample_id}-fastp.json \
-      --thread ${task.cpus} \
-      --average_qual ${params.trim.avg_qual} \
-      --length_required ${params.trim.len_req} \
-      --trim_poly_x \
-      --detect_adapter_for_pe \
-      --dedup
-    """
+  output:
+  tuple val(sample_id),
+        path("${sample_id}_R1_trimmed.fastq.gz"),
+        path("${sample_id}_R2_trimmed.fastq.gz"),
+        path("${sample_id}-fastp.html"),
+        path("${sample_id}-fastp.json")
+
+  script:
+  """
+  fastp \
+    --in1 ${read1} \
+    --in2 ${read2} \
+    --out1 ${sample_id}_R1_trimmed.fastq.gz \
+    --out2 ${sample_id}_R2_trimmed.fastq.gz \
+    --html ${sample_id}-fastp.html \
+    --json ${sample_id}-fastp.json \
+    --thread ${task.cpus} \
+    --average_qual ${params.trim.avg_qual} \
+    --length_required ${params.trim.len_req} \
+    --trim_poly_x \
+    --detect_adapter_for_pe \
+    --dedup
+  """
 }

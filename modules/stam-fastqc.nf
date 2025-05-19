@@ -2,6 +2,8 @@
 
 process FASTQC {
 
+    label "qc"
+
     tag "${reads.simpleName}"
 
     container params.images.QC
