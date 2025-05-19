@@ -2,6 +2,8 @@
 
 process MULTIQC {
 
+    label "qc"
+
     tag "multiqc"
 
     container params.images.QC
