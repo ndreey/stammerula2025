@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name nextflow
-#SBATCH -A naiss2025-22-494
+#SBATCH -A naiss2024-22-580
 #SBATCH -p shared
 #SBATCH -n 1
 #SBATCH -c 2
@@ -18,4 +18,4 @@ ml load nextflow/24.04.2
 
 
 
-nextflow run main.nf -params-file stam-params.yml
+nextflow run main.nf -params-file stam-params.yml 
