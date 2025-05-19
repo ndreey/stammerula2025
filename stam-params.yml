@@ -32,14 +32,24 @@ trim:
 #########################################################################
 # Images are created through seqera (https://seqera.io/)
 # QC: Initial read processing and quality control (created 2025-05-15)
-#   - FastQC    v0.12.1
-#   - MultiQC   v1.28
-#   - fastp     v0.24.1
-#   - pigz      v2.8
+#   channels:
+#   - conda-forge
+#   - bioconda
+#   dependencies:
+#   - bioconda::bbmap=39.00
+#   - bioconda::bwa=0.7.19
+#   - bioconda::fastp=0.24.1
+#   - bioconda::fastqc=0.12.1
+#   - bioconda::minimap2=2.29
+#   - bioconda::multiqc=1.28
+#   - bioconda::picard=3.4.0
+#   - bioconda::samtools=1.20
+#   - bioconda::seqkit=2.10.0
+#   - conda-forge::pigz=2.8
 #
 #
 #
 #########################################################################
 
 images:
-  QC: "oras://community.wave.seqera.io/library/fastp_fastqc_multiqc_pigz:7770390cf9390aae"
+  QC: "oras://community.wave.seqera.io/library/bbmap_bwa_fastp_fastqc_pruned:676e8c82ba1c1ecb"

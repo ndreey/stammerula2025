@@ -9,7 +9,7 @@ data/
 
 # Logs
 slurm-logs/
-
+pipeline_info/
 
 
 
