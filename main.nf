@@ -1,15 +1,30 @@
 #!/usr/bin/env nextflow
 
-include     { FASTQC as FASTQC_RAW }        from './modules/stam-fastqc.nf'
-include     { FASTQC as FASTQC_CCS }        from './modules/stam-fastqc.nf'
-include     { FASTQC as FASTQC_TRIM }       from './modules/stam-fastqc.nf'
-include     { MULTIQC as MULTIQC_RAW }      from './modules/stam-multiqc.nf'
-include     { MULTIQC as MULTIQC_CCS }      from './modules/stam-multiqc.nf'
-include     { MULTIQC as MULTIQC_TRIM }     from './modules/stam-multiqc.nf'
-include     { MULTIQC as MULTIQC_FASTP }    from './modules/stam-multiqc.nf'
-include     { TRIM }                        from './modules/stam-trim.nf'
+include { BWA_INDEX_CONT_REF }                   from './modules/stam-index-bwa.nf'
+include { INDEX_MINIMAP2 }              from './modules/stam-index-minimap2.nf'
+include { FASTQC as FASTQC_RAW }        from './modules/stam-fastqc.nf'
+include { FASTQC as FASTQC_CCS }        from './modules/stam-fastqc.nf'
+include { FASTQC as FASTQC_TRIM }       from './modules/stam-fastqc.nf'
+include { MULTIQC as MULTIQC_RAW }      from './modules/stam-multiqc.nf'
+include { MULTIQC as MULTIQC_CCS }      from './modules/stam-multiqc.nf'
+include { MULTIQC as MULTIQC_TRIM }     from './modules/stam-multiqc.nf'
+include { MULTIQC as MULTIQC_FASTP }    from './modules/stam-multiqc.nf'
+include { TRIM }                        from './modules/stam-trim.nf'
+include { DECON_SR }                    from './modules/stam-decon-sr.nf'
+
+
+
 
 workflow {
+
+    Channel
+	.fromPath(params.decon.cont_ref)
+	.set { cont_ref_ch }
+
+    BWA_INDEX_CONT_REF(cont_ref_ch)
+    BWA_INDEX_CONT_REF.out.cont_ref_index.set { cont_ref_index_ch }
+
+
 
     ////////////////////////////////////////////////////////////////////////////
     // 1. Generate a MultiQC report of the FastQC reports of the raw sr reads
@@ -105,6 +120,17 @@ workflow {
     ////////////////////////////////////////////////////////////////////////////
     // 4. Decontaminate the sr trimmed reads
     ////////////////////////////////////////////////////////////////////////////
+
+    trimmed_output_ch
+	    .map { sample_id, r1, r2, html, json -> tuple(sample_id, r1, r2) }
+	    .set { trimmed_reads_ch }
+
+    // Join reads with index
+    trimmed_reads_ch
+        .combine(cont_ref_index_ch)
+        .set { decon_input_ch }
+
+    DECON_SR(decon_input_ch)
 
 }
 
