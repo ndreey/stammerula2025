@@ -46,9 +46,9 @@ workflow {
 
     // Launch the main pipeline logic
     STAM_PIPELINE(
-        short_reads   : short_reads_ch,
-        long_reads    : long_reads_ch,
-        cont_ref      : cont_ref,
-        cont_headers  : cont_headers
+        short_reads_ch,
+        long_reads_ch,
+        cont_ref,
+        cont_headers
     )
 }
