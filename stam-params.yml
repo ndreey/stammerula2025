@@ -10,6 +10,18 @@ slurm:
 res:
   qc: "results/00-QC"
   trim: "results/01-trimmed"
+  decon: "results/02-decontamination"
+
+# Init params
+metadata:
+  sr: "doc/metadata-sr.csv"
+  lr: "doc/metadata-lr.csv"
+
+references:
+  contamination:
+    fasta: "data/comp_ref/competitive-ref.fasta.gz"
+    headers: "doc/hh-headers.txt"
+    index: "data/comp_ref/competitive-ref.fasta.gz.bwt"  # optional precomputed index
 
 # Process params
 fastqc_raw:
@@ -22,6 +34,10 @@ trim:
   input: "data/sr-raw/*_R{1,2}_001.fastq.gz"
   avg_qual: 20
   len_req: 36
+
+decon:
+  cont_ref: "data/comp_ref/competitive-ref.fasta.gz"
+  cont_headers: "doc/hh-headers.txt"
 
 
 

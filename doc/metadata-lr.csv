@@ -1,0 +1,4 @@
+POP,SAMPLE,CELL,READ
+CHST,pt_042,cell1,data/hifi-ccs-raw/pt_042_001_cell1.ccsreads.fastq.gz
+CHST,pt_042,cell1,data/hifi-ccs-raw/pt_042_001_cell2.ccsreads.fastq.gz
+CHST,pt_042,cell1,data/hifi-ccs-raw/pt_042_001_cell3.ccsreads.fastq.gz
