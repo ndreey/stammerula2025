@@ -5,7 +5,7 @@ process BWA_INDEX_CONT_REF {
 	label 'bwa_index'
 	tag "${cont_ref.simpleName}"
 
-	publishDir 'data/comp_ref', mode: 'symlink', overwrite: false, pattern: "!*.fasta.gz"
+	publishDir 'data/comp_ref', mode: 'symlink', overwrite: false, pattern: "*.{amb,ann,bwt,pac,sa}"
 
     container params.images.QC
 

@@ -17,14 +17,21 @@ include { DECON_SR }                    from './modules/stam-decon-sr.nf'
 
 workflow {
 
-    Channel
-	.fromPath(params.decon.cont_ref)
-	.set { cont_ref_ch }
+    // Define paths
+    def cont_ref_path = file(params.decon.cont_ref)
+    def bwt_file_path = file("${params.decon.cont_ref}.bwt")
 
-    BWA_INDEX_CONT_REF(cont_ref_ch)
-    BWA_INDEX_CONT_REF.out.cont_ref_index.set { cont_ref_index_ch }
+    // Only create the channel if index is missing
+    if ( !bwt_file_path.exists() ) {
+        Channel
+            .fromPath(cont_ref_path)
+            .set { cont_ref_ch }
 
-
+        BWA_INDEX_CONT_REF(cont_ref_ch)
+        BWA_INDEX_CONT_REF.out.cont_ref_index.set { cont_ref_index_ch }
+    } else {
+        log.info "BWA index exists for ${params.decon.cont_ref} — skipping BWA_INDEX_CONT_REF"
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     // 1. Generate a MultiQC report of the FastQC reports of the raw sr reads

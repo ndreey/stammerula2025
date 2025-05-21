@@ -12,6 +12,17 @@ res:
   trim: "results/01-trimmed"
   decon: "results/02-decontamination"
 
+# Init params
+metadata:
+  sr: "doc/metadata-sr.csv"
+  lr: "doc/metadata-lr.csv"
+
+references:
+  contamination:
+    fasta: "data/comp_ref/competitive-ref.fasta.gz"
+    headers: "doc/hh-headers.txt"
+    index: "data/comp_ref/competitive-ref.fasta.gz.bwt"  # optional precomputed index
+
 # Process params
 fastqc_raw:
   input: "data/sr-raw/*.fastq.gz"
