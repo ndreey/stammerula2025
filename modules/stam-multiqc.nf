@@ -3,13 +3,12 @@
 process MULTIQC {
 
     label "qc"
-
     tag "multiqc"
 
     container params.images.QC
 
     input:
-    path fastqc_dir
+    file('reports/*')
 
     output:
     path "multiqc_report.html"
@@ -17,7 +16,7 @@ process MULTIQC {
 
     script:
     """
-    multiqc $fastqc_dir
+    multiqc .
     """
 }
 

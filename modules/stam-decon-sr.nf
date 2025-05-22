@@ -2,65 +2,62 @@
 
 process DECON_SR {
 
-	label "decon"
+    label "decon"
 
-	tag "${sample_id}"
+    tag "${meta.sample}_${meta.lane}"
 
-	publishDir "${params.res.decon}/clean-reads", mode: 'symlink', pattern: '*_R{1,2}-clean.fq.gz'
+    publishDir "${params.res.decon}/clean-reads", mode: 'symlink', pattern: '*_R{1,2}-clean.fq.gz'
 
-	container params.images.QC
+    container params.images.QC
 
-	input:
-	tuple val(sample_id), path(read1), path(read2)
+    input:
+    tuple val(meta), path(read1), path(read2)
+    path comp_ref_index_files
+    path comp_headers
 
-	output:
-	tuple val(sample_id),
-		path("${sample_id}_R1-clean.fq.gz"),
-		path("${sample_id}_R2-clean.fq.gz"),
-		path("${sample_id}_singletons.fq.gz"),
-		emit: decon_reads
+    output:
+    tuple val(meta),
+        path("${meta.sample}_${meta.lane}_R1-clean.fq.gz"),
+        path("${meta.sample}_${meta.lane}_R2-clean.fq.gz"),
+        path("${meta.sample}_${meta.lane}_singletons.fq.gz"),
+        emit: decon_sr_reads
 
-	script:
-	"""
-	# Output file names
-	CONT_BAM="${sample_id}.cont.sorted.bam"
-	CONT_TXT="${sample_id}-cont-reads.txt"
-	CLEAN_RAW_BAM="${sample_id}-clean.bam"
-	CLEAN_SORTED_BAM="${sample_id}-clean.sorted.bam"
-	R1_OUT="${sample_id}_R1-clean.fq.gz"
-	R2_OUT="${sample_id}_R2-clean.fq.gz"
-	SINGLETONS_OUT="${sample_id}_singletons.fq.gz"
+    script:
+    """
+    REF_PREFIX=\$(basename ${comp_ref_index_files[0]} .bwt)
 
-	# Align to contamination reference
-	bwa mem \\
-		-R "@RG\\tID:${sample_id}\\tSM:${sample_id}\\tPL:ILLUMINA" \\
-		-t ${task.cpus} ${params.decon.cont_ref} ${read1} ${read2} | \\
-		samtools view -h -b -@ ${task.cpus} | \\
-		samtools sort -@ ${task.cpus} --write-index -o \$CONT_BAM -
+    CONT_BAM="${meta.sample}_${meta.lane}.comp.sorted.bam"
+    CONT_TXT="${meta.sample}_${meta.lane}-comp-reads.txt"
+    CLEAN_RAW_BAM="${meta.sample}_${meta.lane}-clean.bam"
+    CLEAN_SORTED_BAM="${meta.sample}_${meta.lane}-clean.sorted.bam"
+    R1_OUT="${meta.sample}_${meta.lane}_R1-clean.fq.gz"
+    R2_OUT="${meta.sample}_${meta.lane}_R2-clean.fq.gz"
+    SINGLETONS_OUT="${meta.sample}_${meta.lane}_singletons.fq.gz"
 
-	# Extract contaminant read IDs
-	samtools view -@ ${task.cpus} -f 3 -F 12 -q 20 \$CONT_BAM \$(cat ${params.decon.cont_headers}) | \\
-		awk '{print \$1}' | sort | uniq > \$CONT_TXT
+    bwa mem \\
+        -R "@RG\\tID:${meta.sample}_${meta.lane}\\tSM:${meta.sample}_${meta.lane}\\tPL:ILLUMINA" \\
+        -t ${task.cpus} \$REF_PREFIX ${read1} ${read2} | \\
+        samtools view -h -b -@ ${task.cpus} | \\
+        samtools sort -@ ${task.cpus} --write-index -o \$CONT_BAM -
 
-	# Filter out contaminated reads
-	samtools view -h -@ ${task.cpus} \$CONT_BAM | \\
-		grep -F -v -f \$CONT_TXT | \\
-		samtools view -h -@ ${task.cpus} -b -o \$CLEAN_RAW_BAM -
+    samtools view -@ ${task.cpus} -f 3 -F 12 -q 20 \$CONT_BAM \$(cat ${comp_headers}) | \\
+        awk '{print \$1}' | sort | uniq > \$CONT_TXT
 
-	# Sort for fastq extraction
-	samtools sort -n -@ ${task.cpus} -o \$CLEAN_SORTED_BAM \$CLEAN_RAW_BAM
+    samtools view -h -@ ${task.cpus} \$CONT_BAM | \\
+        grep -F -v -f \$CONT_TXT | \\
+        samtools view -h -@ ${task.cpus} -b -o \$CLEAN_RAW_BAM -
 
-	# Convert to FASTQ
-	samtools fastq \\
-		-@ ${task.cpus} \\
-		-1 \$R1_OUT \\
-		-2 \$R2_OUT \\
-		-s \$SINGLETONS_OUT \\
-		-0 /dev/null \$CLEAN_SORTED_BAM
+    samtools sort -n -@ ${task.cpus} -o \$CLEAN_SORTED_BAM \$CLEAN_RAW_BAM
 
-	# Clean up intermediates
-	rm \$CONT_BAM \$CONT_BAM.bai \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM
-	"""
+    samtools fastq \\
+        -@ ${task.cpus} \\
+        -1 \$R1_OUT \\
+        -2 \$R2_OUT \\
+        -s \$SINGLETONS_OUT \\
+        -0 /dev/null \$CLEAN_SORTED_BAM
+
+    #rm \$CONT_BAM \$CONT_BAM.bai \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM
+    """
 }
 
 

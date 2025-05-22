@@ -35,20 +35,20 @@ workflow {
             def meta = [
                 pop     : row.POP,
                 sample  : row.SAMPLE,
-                cell    : row.CELL
+                lane    : row.CELL
             ]
             tuple(meta, file(row.READ))
         }
 
     // Load contamination reference and headers from params
-    def cont_ref      = file(params.references.contamination.fasta)
-    def cont_headers  = file(params.references.contamination.headers)
+    def comp_ref      = file(params.references.comp.fasta)
+    def comp_headers  = file(params.references.comp.headers)
 
     // Launch the main pipeline logic
     STAM_PIPELINE(
         short_reads_ch,
         long_reads_ch,
-        cont_ref,
-        cont_headers
+        comp_ref,
+        comp_headers
     )
 }

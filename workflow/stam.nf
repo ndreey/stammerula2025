@@ -10,16 +10,16 @@ workflow STAM_PIPELINE {
     take:
         short_reads
         long_reads
-        cont_ref
-        cont_headers
+        comp_ref
+        comp_headers
 
     main:
 
         QC_PREPROCESSING(
             short_reads,
             long_reads,
-            cont_ref,
-            cont_headers
+            comp_ref,
+            comp_headers
         )
 
         //ASSEMBLY(
