@@ -19,7 +19,7 @@ metadata:
 
 references:
   comp:
-    fasta: "data/comp_ref/competitive-ref.fasta.gz"
+    fasta: "data/comp_ref/test-comp.fasta.gz"
     headers: "doc/hh-headers.txt"
     index: "data/comp_ref/competitive-ref.fasta.gz.bwt"  # optional precomputed index
 

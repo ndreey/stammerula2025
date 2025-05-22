@@ -12,8 +12,6 @@ include { MULTIQC as MULTIQC_FASTP }    from '../modules/stam-multiqc.nf'
 include { TRIM }                        from '../modules/stam-trim.nf'
 include { DECON_SR }                    from '../modules/stam-decon-sr.nf'
 
-
-
 workflow QC_PREPROCESSING {
 
     take:
@@ -33,13 +31,12 @@ workflow QC_PREPROCESSING {
 
         FASTQC_RAW(sr_raw_reads)
 
-        FASTQC_RAW.out.fastqc_html
+        FASTQC_RAW.out.fastqc_files
             .collect()
             .ifEmpty([])
             .set { multiqc_input_raw }
 
         MULTIQC_RAW(multiqc_input_raw)
-
 
         ////////////////////////////////////////////////////////////////////////////
         // 1.1 Generate a MultiQC report of the FastQC reports of the raw CCS reads
@@ -51,13 +48,12 @@ workflow QC_PREPROCESSING {
 
         FASTQC_CCS(lr_reads)
 
-        FASTQC_CCS.out.fastqc_html
+        FASTQC_CCS.out.fastqc_files
             .collect()
             .ifEmpty([])
             .set { multiqc_input_ccs }
 
         MULTIQC_CCS(multiqc_input_ccs)
-
 
         ////////////////////////////////////////////////////////////////////////////
         // 3. Trim short reads and generate MultiQC of FastQC and fastp reports
@@ -66,13 +62,12 @@ workflow QC_PREPROCESSING {
         TRIM(short_reads)
 
         TRIM.out.trimmed_reads
-            .map { meta, r1_trim, r2_trim -> [ tuple(meta, r1_trim), tuple(meta, r2_trim) ] }
-            .flatten()
+            .flatMap { meta, r1_trim, r2_trim -> [ tuple(meta, r1_trim), tuple(meta, r2_trim) ] }
             .set { trimmed_reads }
 
         FASTQC_TRIM(trimmed_reads)
 
-        FASTQC_TRIM.out.fastqc_html
+        FASTQC_TRIM.out.fastqc_files
             .collect()
             .ifEmpty([])
             .set { multiqc_input_trim }
@@ -80,40 +75,29 @@ workflow QC_PREPROCESSING {
         MULTIQC_TRIM(multiqc_input_trim)
 
         TRIM.out.fastp_reports
-            .map { meta, html, json -> html }
+            .map { meta, html, json -> json }
             .collect()
-            .ifEmpty([])
             .set { multiqc_input_fastp }
 
         MULTIQC_FASTP(multiqc_input_fastp)
 
-
-        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////
         // 6. Index competitive reference
-        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////
 
         BWA_INDEX_COMP_REF(comp_ref)
 
-        BWA_INDEX_COMP_REF.out.comp_ref_index
-            .set { comp_ref_index_ch }
+        BWA_INDEX_COMP_REF.out.comp_ref_files
+            .set { comp_ref_files_ch }
 
-
-        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////
         // 7. Decontaminate trimmed short reads
-        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////
 
         DECON_SR(
             TRIM.out.trimmed_reads,
-            comp_ref_index_ch,
-            comp_headers)
+            comp_ref_files_ch,
+            comp_headers
+        )
 
-
-        // Needed for emit block below
-        TRIM.out.trimmed_reads.set { trimmed_output_ch }
-
-    emit:
-        decont_trimmed_reads = DECON_SR.out.decon_sr_reads
-        long_reads           = long_reads
-        metadata             = trimmed_output_ch.map { meta, r1, r2 -> meta.sample }
 }
-

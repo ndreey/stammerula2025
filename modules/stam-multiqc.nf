@@ -16,7 +16,7 @@ process MULTIQC {
 
     script:
     """
-    multiqc .
+    multiqc reports
     """
 }
 

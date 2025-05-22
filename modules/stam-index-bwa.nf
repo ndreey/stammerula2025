@@ -5,7 +5,7 @@ process BWA_INDEX_COMP_REF {
     label 'bwa_index'
     tag "${comp_ref.simpleName}"
 
-    publishDir 'data/comp_ref', mode: 'symlink', overwrite: false, pattern: "*.{amb,ann,bwt,pac,sa}"
+    publishDir 'data/comp_ref', mode: 'copy', overwrite: false, pattern: "*.{amb,ann,bwt,pac,sa}"
 
     container params.images.QC
 
@@ -13,7 +13,7 @@ process BWA_INDEX_COMP_REF {
     path comp_ref
 
     output:
-    tuple val(comp_ref.getSimpleName()), path("${comp_ref.simpleName}.*"), emit: comp_ref_index
+    tuple path(comp_ref), path("${comp_ref.getName()}.*"), emit: comp_ref_files
 
     script:
     """

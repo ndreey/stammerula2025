@@ -10,10 +10,10 @@ process DECON_SR {
 
     container params.images.QC
 
-    input:
-    tuple val(meta), path(read1), path(read2)
-    path comp_ref_index_files
-    path comp_headers
+	input:
+	tuple val(meta), path(read1), path(read2)
+	tuple path(comp_ref), path(index_files)
+	path comp_headers
 
     output:
     tuple val(meta),
@@ -24,8 +24,6 @@ process DECON_SR {
 
     script:
     """
-    REF_PREFIX=\$(basename ${comp_ref_index_files[0]} .bwt)
-
     CONT_BAM="${meta.sample}_${meta.lane}.comp.sorted.bam"
     CONT_TXT="${meta.sample}_${meta.lane}-comp-reads.txt"
     CLEAN_RAW_BAM="${meta.sample}_${meta.lane}-clean.bam"
@@ -36,7 +34,7 @@ process DECON_SR {
 
     bwa mem \\
         -R "@RG\\tID:${meta.sample}_${meta.lane}\\tSM:${meta.sample}_${meta.lane}\\tPL:ILLUMINA" \\
-        -t ${task.cpus} \$REF_PREFIX ${read1} ${read2} | \\
+        -t ${task.cpus} ${comp_ref} ${read1} ${read2} | \\
         samtools view -h -b -@ ${task.cpus} | \\
         samtools sort -@ ${task.cpus} --write-index -o \$CONT_BAM -
 
