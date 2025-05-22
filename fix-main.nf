@@ -41,8 +41,8 @@ workflow {
         }
 
     // Load contamination reference and headers from params
-    def comp_ref      = file(params.references.comp.fasta)
-    def comp_headers  = file(params.references.comp.headers)
+    comp_ref = Channel.fromPath(params.references.comp.fasta, checkIfExists: true)
+    comp_headers = Channel.fromPath(params.references.comp.headers, checkIfExists: true)
 
     // Launch the main pipeline logic
     STAM_PIPELINE(

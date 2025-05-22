@@ -11,8 +11,7 @@ process FASTQC {
     tuple val(meta), path(read)
 
     output:
-    path "*_fastqc.html", emit: fastqc_html
-    path "*_fastqc.zip"
+    path "*_fastqc.{html,zip}", emit: fastqc_files
 
     script:
     """
