@@ -1,24 +1,22 @@
 #!/usr/bin/env nextflow
 
-process BWA_INDEX_CONT_REF {
+process BWA_INDEX_COMP_REF {
 
-	label 'bwa_index'
-	tag "${cont_ref.simpleName}"
+    label 'bwa_index'
+    tag "${comp_ref.simpleName}"
 
-	publishDir 'data/comp_ref', mode: 'symlink', overwrite: false, pattern: "*.{amb,ann,bwt,pac,sa}"
+    publishDir 'data/comp_ref', mode: 'symlink', overwrite: false, pattern: "*.{amb,ann,bwt,pac,sa}"
 
     container params.images.QC
 
-	input:
-	path cont_ref
+    input:
+    path comp_ref
 
-	output:
-	tuple val(cont_ref.simpleName), path("${cont_ref.simpleName}.*"), emit: cont_ref_index
+    output:
+    tuple val(comp_ref.getSimpleName()), path("${comp_ref.simpleName}.*"), emit: comp_ref_index
 
-	script:
-	"""
-	bwa index ${cont_ref}
-	"""
+    script:
+    """
+    bwa index ${comp_ref}
+    """
 }
-
-

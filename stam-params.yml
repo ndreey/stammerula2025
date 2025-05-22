@@ -18,7 +18,7 @@ metadata:
   lr: "doc/metadata-lr.csv"
 
 references:
-  contamination:
+  comp:
     fasta: "data/comp_ref/competitive-ref.fasta.gz"
     headers: "doc/hh-headers.txt"
     index: "data/comp_ref/competitive-ref.fasta.gz.bwt"  # optional precomputed index
@@ -35,9 +35,6 @@ trim:
   avg_qual: 20
   len_req: 36
 
-decon:
-  cont_ref: "data/comp_ref/competitive-ref.fasta.gz"
-  cont_headers: "doc/hh-headers.txt"
 
 
 

@@ -2,38 +2,43 @@
 
 process TRIM {
 
-  label "trim"
+    label "trim"
 
-  tag "${sample_id}"
+    tag "${meta.sample}_${meta.lane}"
 
-  publishDir params.res.trim, mode: 'symlink', pattern: "*.fastq.gz"
+    publishDir params.res.trim, mode: 'symlink', pattern: "*.fastq.gz"
 
-  container params.images.QC
+    container params.images.QC
 
-  input:
-  tuple val(sample_id), path(read1), path(read2)
+    input:
+    tuple val(meta), path(read1), path(read2)
 
-  output:
-  tuple val(sample_id),
-    path("${sample_id}_R1_trimmed.fastq.gz"),
-    path("${sample_id}_R2_trimmed.fastq.gz"),
-    path("${sample_id}-fastp.html"),
-    path("${sample_id}-fastp.json")
+    output:
+    tuple val(meta),
+        path("${meta.sample}_${meta.lane}_R1_trimmed.fastq.gz"),
+        path("${meta.sample}_${meta.lane}_R2_trimmed.fastq.gz"),
+        emit: trimmed_reads
 
-  script:
-  """
-  fastp \
-    --in1 ${read1} \\
-    --in2 ${read2} \\
-    --out1 ${sample_id}_R1_trimmed.fastq.gz \\
-    --out2 ${sample_id}_R2_trimmed.fastq.gz \\
-    --html ${sample_id}-fastp.html \\
-    --json ${sample_id}-fastp.json \\
-    --thread ${task.cpus} \\
-    --average_qual ${params.trim.avg_qual} \\
-    --length_required ${params.trim.len_req} \\
-    --trim_poly_x \\
-    --detect_adapter_for_pe \\
-    --dedup
-  """
+    tuple val(meta),
+        path("${meta.sample}_${meta.lane}-fastp.html"),
+        path("${meta.sample}_${meta.lane}-fastp.json"),
+        emit: fastp_reports
+
+    script:
+    """
+    fastp \\
+        --in1 ${read1} \\
+        --in2 ${read2} \\
+        --out1 ${meta.sample}_${meta.lane}_R1_trimmed.fastq.gz \\
+        --out2 ${meta.sample}_${meta.lane}_R2_trimmed.fastq.gz \\
+        --html ${meta.sample}_${meta.lane}-fastp.html \\
+        --json ${meta.sample}_${meta.lane}-fastp.json \\
+        --thread ${task.cpus} \\
+        --average_qual ${params.trim.avg_qual} \\
+        --length_required ${params.trim.len_req} \\
+        --trim_poly_x \\
+        --detect_adapter_for_pe \\
+        --dedup
+    """
 }
+
