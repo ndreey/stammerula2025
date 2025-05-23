@@ -2,22 +2,23 @@
 
 process INDEX_MINIMAP2 {
 
-	label 'index'
-	tag "${ref.simpleName}"
+    label 'minimap2_index'
+    tag "${comp_ref.simpleName}"
 
-    container params.images.QC
-    
-	input:
-	path ref
+    publishDir 'data/comp_ref', mode: 'copy', overwrite: false, pattern: "*.mmi"
 
-	output:
-	path "${ref.simpleName}.mmi", emit: minimap2_index
+    container params.images.ALIGN
 
-	when:
-		!file("${ref.simpleName}.mmi").exists()
+    input:
+    path comp_ref
+
+    output:
+    path("*.mmi"), emit: comp_mmi
 
 	script:
 	"""
-	minimap2 -d ${ref.simpleName}.mmi ${ref}
+	minimap2 -x map-hifi -d ${comp_ref}.mmi \\
+    	--split-prefix ${comp_ref.simpleName}-split \\
+    	${comp_ref}
 	"""
 }
