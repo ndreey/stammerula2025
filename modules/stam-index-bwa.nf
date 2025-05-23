@@ -7,13 +7,13 @@ process BWA_INDEX_COMP_REF {
 
     publishDir 'data/comp_ref', mode: 'copy', overwrite: false, pattern: "*.{amb,ann,bwt,pac,sa}"
 
-    container params.images.QC
+    container params.images.ALIGN
 
     input:
     path comp_ref
 
     output:
-    tuple path(comp_ref), path("${comp_ref.getName()}.*"), emit: comp_ref_files
+    path("*.{amb,ann,bwt,pac,sa}"), emit: comp_idx
 
     script:
     """
