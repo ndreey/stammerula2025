@@ -69,9 +69,7 @@ workflow FILE_MERGER {
 
         // Validate merged population reads (simplified - no metadata needed)
         mergeByPop.out.pop_merged
-            .map { files -> 
-                def r1 = files.find { it.name.contains('_R1') }
-                def r2 = files.find { it.name.contains('_R2') }
+            .map { pop_id, r1, r2 -> 
                 tuple(r1, r2, "pop-merged")
             }
             .set { pop_validation_input }
@@ -95,6 +93,8 @@ workflow FILE_MERGER {
 
         // Get statistics for population-merged files
         mergeByPop.out.pop_merged
+            .map { pop_id, r1, r2 -> [r1, r2] }
+            .flatten()
             .collect()
             .map { files -> tuple(files, "pop-merged") }
             .set { pop_stats_input }

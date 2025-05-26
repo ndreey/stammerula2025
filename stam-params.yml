@@ -83,6 +83,14 @@ trim:
 #   - bioconda::bbmap=39.00
 #   - bioconda::biopet-validatefastq=0.1.1
 #   - bioconda::seqkit=2.10.0
+#
+# ASSEMBLY: Metagenome assembler for both short and long reads (created 2025-05-26)
+#   channels:
+#   - conda-forge
+#   - bioconda
+#   dependencies:
+#   - bioconda::megahit=1.2.9
+#   - bioconda::metamdbg=1.1
 #########################################################################
 
 images:
