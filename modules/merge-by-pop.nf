@@ -13,7 +13,7 @@ process mergeByPop {
     tuple val(pop_id), path(r1_files), path(r2_files)
 
     output:
-    path("*_R{1,2}.fq.gz"), emit: pop_merged
+    tuple val(pop_id), path("${pop_id}_R1.fq.gz"), path("${pop_id}_R2.fq.gz"), emit: pop_merged
 
     script:
     """
