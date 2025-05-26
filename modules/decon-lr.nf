@@ -6,7 +6,7 @@ process DECON_LR {
 
     tag "${meta.sample}_${meta.lane}"
 
-    publishDir "${params.res.decon}/clean-reads-lr", mode: 'symlink', pattern: '*_-clean.fq.gz'
+    publishDir "${params.res.decon}/clean-reads-lr", mode: 'symlink', pattern: '*-clean.fq.gz'
 
     container params.images.ALIGN
 
@@ -17,7 +17,7 @@ process DECON_LR {
     path(comp_headers)
 
     output:
-    tuple val(meta), path("*.clean.fq.gz"), emit: decon_lr_reads
+    tuple val(meta), path("*-clean.fq.gz"), emit: decon_lr_reads
     
     script:
     """
@@ -34,7 +34,7 @@ process DECON_LR {
     CONT_TXT=\${ID}-cont-reads.txt
     CLEAN_RAW_BAM=\${ID}-clean.bam
     CLEAN_SORTED_BAM=\${ID}-clean.sorted.bam
-    READ_OUT=\${ID}-clean.fastq
+    READ_OUT=\${ID}-clean.fq
 
     echo "[INFO]		Align to competetive reference"
     minimap2 \\
@@ -64,7 +64,7 @@ process DECON_LR {
 
     echo "[INFO]		Write the reads to fastqc"
     bedtools bamtofastq -i \$CLEAN_SORTED_BAM -fq \$READ_OUT
-    gzip \$READ_OUT
+    pigz -p \$CPU \$READ_OUT
 
     echo "[INFO]		Remove the temporary files"
     rm \$CONT_BAM \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM

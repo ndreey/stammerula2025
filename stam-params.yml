@@ -72,6 +72,7 @@ trim:
 #   - bioconda::minimap2=2.29
 #   - bioconda::picard=3.4.0
 #   - bioconda::samtools=1.20
+#   - conda-forge::pigz=2.8
 #
 # STATS: Sequence statistics programs (created 2025-05-22)
 #   channels:
@@ -85,5 +86,6 @@ trim:
 
 images:
   QC: "oras://community.wave.seqera.io/library/bbmap_bwa_fastp_fastqc_pruned:676e8c82ba1c1ecb"
-  ALIGN: "oras://community.wave.seqera.io/library/bedtools_bwa_minimap2_picard_samtools:c642dee32fc2c276"
+  #ALIGN: "oras://community.wave.seqera.io/library/bedtools_bwa_minimap2_picard_samtools:c642dee32fc2c276"
+  ALIGN: "oras://community.wave.seqera.io/library/bedtools_bwa_minimap2_picard_pruned:4abd28692b1e99f7"
   STATS: "oras://community.wave.seqera.io/library/bbmap_biopet-validatefastq_seqkit:a1c4fb2615ae72e6"
