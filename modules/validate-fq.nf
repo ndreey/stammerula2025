@@ -1,24 +1,28 @@
+#!/usr/bin/env nextflow
+
 process VALIDATE_PE {
 
     label 'stats'
-    tag "validate-${meta.sample}_${meta.lane}-${type}"
+    tag "validate-${read1.getSimpleName().replaceAll(/_R[12][-_]?.*$/, '')}-${type}"
 
     container params.images.STATS
 
     input:
-    tuple val(meta), path(read1), path(read2), val(type)
+    tuple path(read1), path(read2), val(type)
 
     output:
     path("*.validate"), emit: validate
 
     script:
     """
-    biopet-validatefastq -i ${read1} -j ${read2} &> ${meta.sample}_${meta.lane}-${type}-validate.txt
+    SAMPLE_NAME=${read1.getSimpleName().replaceAll(/_R[12][-_]?.*$/, '')}
+    
+    biopet-validatefastq -i ${read1} -j ${read2} &> \${SAMPLE_NAME}-${type}-validate.txt
 
-    if grep -q "no errors found" ${meta.sample}_${meta.lane}-${type}-validate.txt; then
-        echo "${meta.sample}_${meta.lane}-${type},PASSED" > ${meta.sample}_${meta.lane}-passed.validate
+    if grep -q "no errors found" \${SAMPLE_NAME}-${type}-validate.txt; then
+        echo "\${SAMPLE_NAME}-${type},PASSED" > \${SAMPLE_NAME}-passed.validate
     else
-        echo "${meta.sample}_${meta.lane}-${type},FAILED" > ${meta.sample}_${meta.lane}-failed.validate
+        echo "\${SAMPLE_NAME}-${type},FAILED" > \${SAMPLE_NAME}-failed.validate
     fi
     """
 }

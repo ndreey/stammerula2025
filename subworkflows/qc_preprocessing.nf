@@ -47,7 +47,7 @@ workflow QC_PREPROCESSING {
 
         // Check validation of pair-end reads
         short_reads
-            .map { meta, r1, r2 -> tuple(meta, r1, r2, "sr-raw") }
+            .map { meta, r1, r2 -> tuple(r1, r2, "sr-raw") }
             .set { short_reads_raw }
 
         VALIDATE_PE_RAW(short_reads_raw)
@@ -146,7 +146,7 @@ workflow QC_PREPROCESSING {
         
         // Check validation of pair-end reads
         TRIM.out.trimmed_reads
-            .map { meta, r1, r2 -> tuple(meta, r1, r2, "sr-trim") }
+            .map { meta, r1, r2 -> tuple(r1, r2, "sr-trim") }
             .set { short_reads_trim }
 
         VALIDATE_PE_TRIM(short_reads_trim)
@@ -206,7 +206,7 @@ workflow QC_PREPROCESSING {
         // 5. Validate and get stats of the decon reads
         ////////////////////////////////////////////////////////////////////////////
         DECON_SR.out.decon_sr_reads
-            .map { meta, r1, r2 -> tuple(meta, r1, r2, "sr-decon") }
+            .map { meta, r1, r2 -> tuple(r1, r2, "sr-decon") }
             .set { short_reads_decon }
 
         VALIDATE_PE_DECON(short_reads_decon)
