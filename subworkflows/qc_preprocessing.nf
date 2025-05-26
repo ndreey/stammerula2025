@@ -1,35 +1,35 @@
 #!/usr/bin/env nextflow
 
 // Validate pair-end fastq files
-include { VALIDATE_PE as VALIDATE_PE_RAW }              from '../modules/stam-validatefq.nf'
-include { MERGE_VALI_RES as MERGE_VALI_RES_RAW }        from '../modules/stam-validatefq.nf'
-include { VALIDATE_PE as VALIDATE_PE_TRIM }             from '../modules/stam-validatefq.nf'
-include { MERGE_VALI_RES as MERGE_VALI_RES_TRIM }       from '../modules/stam-validatefq.nf'
-include { VALIDATE_PE as VALIDATE_PE_DECON }            from '../modules/stam-validatefq.nf'
-include { MERGE_VALI_RES as MERGE_VALI_RES_DECON }      from '../modules/stam-validatefq.nf'
+include { VALIDATE_PE as VALIDATE_PE_RAW }              from '../modules/validate-fq.nf'
+include { MERGE_VALI_RES as MERGE_VALI_RES_RAW }        from '../modules/validate-fq.nf'
+include { VALIDATE_PE as VALIDATE_PE_TRIM }             from '../modules/validate-fq.nf'
+include { MERGE_VALI_RES as MERGE_VALI_RES_TRIM }       from '../modules/validate-fq.nf'
+include { VALIDATE_PE as VALIDATE_PE_DECON }            from '../modules/validate-fq.nf'
+include { MERGE_VALI_RES as MERGE_VALI_RES_DECON }      from '../modules/validate-fq.nf'
 
 // Sequence statistics after each processing step
-include {FASTQ_STATS as FASTQ_STATS_SR_RAW}            from '../modules/stam-seq-stats.nf'
-include {FASTQ_STATS as FASTQ_STATS_SR_TRIM}           from '../modules/stam-seq-stats.nf'
-include {FASTQ_STATS as FASTQ_STATS_SR_DECON}          from '../modules/stam-seq-stats.nf'
-include {FASTQ_STATS as FASTQ_STATS_LR_RAW}            from '../modules/stam-seq-stats.nf'
-include {FASTQ_STATS as FASTQ_STATS_LR_DECON}          from '../modules/stam-seq-stats.nf'
+include {FASTQ_STATS as FASTQ_STATS_SR_RAW}            from '../modules/seq-stats.nf'
+include {FASTQ_STATS as FASTQ_STATS_SR_TRIM}           from '../modules/seq-stats.nf'
+include {FASTQ_STATS as FASTQ_STATS_SR_DECON}          from '../modules/seq-stats.nf'
+include {FASTQ_STATS as FASTQ_STATS_LR_RAW}            from '../modules/seq-stats.nf'
+include {FASTQ_STATS as FASTQ_STATS_LR_DECON}          from '../modules/seq-stats.nf'
 
 // FastQC and MultiQC reports
-include { FASTQC as FASTQC_RAW }                        from '../modules/stam-fastqc.nf'
-include { FASTQC as FASTQC_CCS }                        from '../modules/stam-fastqc.nf'
-include { FASTQC as FASTQC_TRIM }                       from '../modules/stam-fastqc.nf'
-include { MULTIQC as MULTIQC_RAW }                      from '../modules/stam-multiqc.nf'
-include { MULTIQC as MULTIQC_CCS }                      from '../modules/stam-multiqc.nf'
-include { MULTIQC as MULTIQC_TRIM }                     from '../modules/stam-multiqc.nf'
-include { MULTIQC as MULTIQC_FASTP }                    from '../modules/stam-multiqc.nf'
+include { FASTQC as FASTQC_RAW }                        from '../modules/fastqc.nf'
+include { FASTQC as FASTQC_CCS }                        from '../modules/fastqc.nf'
+include { FASTQC as FASTQC_TRIM }                       from '../modules/fastqc.nf'
+include { MULTIQC as MULTIQC_RAW }                      from '../modules/multiqc.nf'
+include { MULTIQC as MULTIQC_CCS }                      from '../modules/multiqc.nf'
+include { MULTIQC as MULTIQC_TRIM }                     from '../modules/multiqc.nf'
+include { MULTIQC as MULTIQC_FASTP }                    from '../modules/multiqc.nf'
 
 // Trimming and Decontamination
-include { TRIM }                                        from '../modules/stam-trim.nf'
-include { BWA_INDEX_COMP_REF }                          from '../modules/stam-index-bwa.nf'
-include { INDEX_MINIMAP2 }                              from '../modules/stam-index-minimap2.nf'
-include { DECON_SR }                                    from '../modules/stam-decon-sr.nf'
-include { DECON_LR }                                    from '../modules/stam-decon-lr.nf'
+include { TRIM }                                        from '../modules/trim.nf'
+include { BWA_INDEX_COMP_REF }                          from '../modules/index-bwa.nf'
+include { INDEX_MINIMAP2 }                              from '../modules/index-minimap2.nf'
+include { DECON_SR }                                    from '../modules/decon-sr.nf'
+include { DECON_LR }                                    from '../modules/decon-lr.nf'
 
 workflow QC_PREPROCESSING {
 
@@ -225,7 +225,7 @@ workflow QC_PREPROCESSING {
             .map { files -> tuple(files, "sr-decon") }
             .set { decon_sr }
         
-        DECON_LR.out.decon_sr_reads
+        DECON_LR.out.decon_lr_reads
             .flatMap { meta, read -> [read] }
             .collect()
             .map { files -> tuple(files, "lr-decon") }
@@ -233,4 +233,20 @@ workflow QC_PREPROCESSING {
         
         FASTQ_STATS_SR_DECON(decon_sr)
         FASTQ_STATS_LR_DECON(decon_lr)
+
+        ////////////////////////////////////////////////////////////////////////////
+        // 6. Collect and emit the decontaminated reads
+        ////////////////////////////////////////////////////////////////////////////
+
+        DECON_SR.out.decon_sr_reads
+            .collect()
+            .set { emit_decon_sr }
+        
+        DECON_LR.out.decon_lr_reads
+            .collect()
+            .set { emit_decon_lr }
+
+    emit:
+        decon_sr_reads = emit_decon_sr
+        decon_lr_reads = emit_decon_lr
 }

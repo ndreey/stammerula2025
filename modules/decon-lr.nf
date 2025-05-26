@@ -17,7 +17,7 @@ process DECON_LR {
     path(comp_headers)
 
     output:
-    tuple val(meta), path("*.clean.fq.gz"), emit: decon_sr_reads
+    tuple val(meta), path("*.clean.fq.gz"), emit: decon_lr_reads
     
     script:
     """

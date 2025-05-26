@@ -1,7 +1,8 @@
 #!/usr/bin/env nextflow
 
 
-include { QC_PREPROCESSING }        from '../subworkflows/qc_preprocessing.nf'
+include { QC_PREPROCESSING }                from '../subworkflows/qc_preprocessing.nf'
+include { FILE_MERGER }                     from '../subworkflows/merger.nf'
 //include { ASSEMBLY }                from '../subworkflows/assembly.nf'
 //include { BINNING }                 from '../subworkflows/binning.nf'
 
@@ -22,6 +23,10 @@ workflow STAM_PIPELINE {
             comp_headers
         )
 
+        // Merge decontaminated reads based on metadata
+        FILE_MERGER(
+            QC_PREPROCESSING.out.decon_sr_reads
+        )
         //ASSEMBLY(
         //    decont_trimmed_reads : QC_PREPROCESSING.out.decont_trimmed_reads,
         //    long_reads           : QC_PREPROCESSING.out.long_reads,
