@@ -1,8 +1,7 @@
 #!/usr/bin/env nextflow
 
-
-
-
+include { longAssembly }                                        from '../modules/metamdbg.nf'
+include { shortssembly }                                        from '../modules/megahit.nf'
 
 
 workflow META_ASSEMBLY {
