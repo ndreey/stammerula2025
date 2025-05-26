@@ -6,6 +6,7 @@ work/
 # Folders with large data
 results/
 data/
+containers/
 
 # Logs
 slurm-logs/
