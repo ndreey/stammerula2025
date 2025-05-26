@@ -1,14 +1,19 @@
 #!/usr/bin/env nextflow
 
 // Merge fastq files
-include { mergeBySample }              from '../modules/merge-by-sample.nf'
-include { mergeByPop }                 from '../modules/merge-by-pop.nf'
+include { mergeBySample }                               from '../modules/merge-by-sample.nf'
+include { mergeByPop }                                  from '../modules/merge-by-pop.nf'
 
 // Validate merger
-include { VALIDATE_PE as VALIDATE_PE_SAMPLE }    from '../modules/validate-fq.nf'
-include { VALIDATE_PE as VALIDATE_PE_POP }       from '../modules/validate-fq.nf'
-include { MERGE_VALI_RES as MERGE_VALI_RES_SAMPLE } from '../modules/validate-fq.nf'
-include { MERGE_VALI_RES as MERGE_VALI_RES_POP }    from '../modules/validate-fq.nf'
+include { VALIDATE_PE as VALIDATE_PE_SAMPLE }           from '../modules/validate-fq.nf'
+include { VALIDATE_PE as VALIDATE_PE_POP }              from '../modules/validate-fq.nf'
+include { MERGE_VALI_RES as MERGE_VALI_RES_SAMPLE }     from '../modules/validate-fq.nf'
+include { MERGE_VALI_RES as MERGE_VALI_RES_POP }        from '../modules/validate-fq.nf'
+
+// FASTQ Statistics
+include { FASTQ_STATS as FASTQ_STATS_SAMPLE_MERGED }    from '../modules/seq-stats.nf'
+include { FASTQ_STATS as FASTQ_STATS_POP_MERGED }       from '../modules/seq-stats.nf'
+
 
 workflow FILE_MERGER {
 
@@ -80,9 +85,27 @@ workflow FILE_MERGER {
 
         MERGE_VALI_RES_POP(pop_validate_results)
 
+        // Get statistics for sample-merged files
+        mergeBySample.out.sample_merged
+            .collect()
+            .map { files -> tuple(files, "sample-merged") }
+            .set { sample_stats_input }
+
+        FASTQ_STATS_SAMPLE_MERGED(sample_stats_input)
+
+        // Get statistics for population-merged files
+        mergeByPop.out.pop_merged
+            .collect()
+            .map { files -> tuple(files, "pop-merged") }
+            .set { pop_stats_input }
+
+        FASTQ_STATS_POP_MERGED(pop_stats_input)
+
     emit:
         merged_reads = mergeBySample.out.sample_merged
         merged_pops = mergeByPop.out.pop_merged
         sample_validation = MERGE_VALI_RES_SAMPLE.out.validate_csv
         pop_validation = MERGE_VALI_RES_POP.out.validate_csv
+        sample_stats = FASTQ_STATS_SAMPLE_MERGED.out.seq_stats_csv
+        pop_stats = FASTQ_STATS_POP_MERGED.out.seq_stats_csv
 }
