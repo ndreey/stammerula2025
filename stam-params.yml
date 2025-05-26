@@ -11,6 +11,8 @@ res:
   qc: "results/00-QC"
   trim: "results/01-trimmed"
   decon: "results/02-decontamination"
+  mergedSample: "results/03-sample-merged-sr"
+  mergedPop: "results/04-pop-merged-sr"
 
 # Init params
 metadata:
