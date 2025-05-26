@@ -2,7 +2,7 @@
 
 process longAssembly {
 
-    label "assembly"
+    label "metamdbg"
 
     tag "lr-metagenome-assembly"
 
