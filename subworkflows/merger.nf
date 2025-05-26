@@ -22,8 +22,14 @@ workflow FILE_MERGER {
 
     main:
 
-        // Group decontaminated reads by sample and collect all files per sample
+        // Collect all decontaminated reads first to ensure complete data
         decon_sr_reads
+            .collect()
+            .flatten()
+            .set { all_decon_reads }
+
+        // Group decontaminated reads by sample and collect all files per sample
+        all_decon_reads
             .map { meta, r1, r2 -> 
                 tuple(meta.sample, meta.pop, r1, r2)
             }
@@ -37,7 +43,7 @@ workflow FILE_MERGER {
         mergeBySample(grouped_reads)
 
         // Group decontaminated reads by population and collect all files per population
-        decon_sr_reads
+        all_decon_reads
             .map { meta, r1, r2 -> 
                 tuple(meta.pop, r1, r2)
             }
