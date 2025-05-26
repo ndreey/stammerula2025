@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 
 
-include { QC_PREPROCESSING }                from '../subworkflows/qc_preprocessing.nf'
-include { FILE_MERGER }                     from '../subworkflows/merger.nf'
-//include { ASSEMBLY }                from '../subworkflows/assembly.nf'
+include { QC_PREPROCESSING }                        from '../subworkflows/qc_preprocessing.nf'
+include { FILE_MERGER }                             from '../subworkflows/merger.nf'
+include { META_ASSEMBLY }                           from '../subworkflows/meta-assembly.nf'
 //include { BINNING }                 from '../subworkflows/binning.nf'
 
 workflow STAM_PIPELINE {
@@ -27,11 +27,10 @@ workflow STAM_PIPELINE {
         FILE_MERGER(
             QC_PREPROCESSING.out.decon_sr_reads
         )
-        //ASSEMBLY(
-        //    decont_trimmed_reads : QC_PREPROCESSING.out.decont_trimmed_reads,
-        //    long_reads           : QC_PREPROCESSING.out.long_reads,
-        //    metadata             : QC_PREPROCESSING.out.metadata
-        //)
+        META_ASSEMBLY(
+            FILE_MERGER.out.merged_pops,
+            QC_PREPROCESSING.out.decon_lr_reads
+        )
 
         //BINNING(
         //    assemblies           : ASSEMBLY.out.assemblies,
