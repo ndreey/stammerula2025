@@ -1,7 +1,6 @@
 #!/usr/bin/env nextflow
 
 include { mergeBySample }              from '../modules/merge-by-sample.nf'
-//include { MERGE_VALI_RES as MERGE_VALI_RES_RAW }        from '../modules/stam-validatefq.nf'
 
 workflow FILE_MERGER {
 
@@ -10,8 +9,20 @@ workflow FILE_MERGER {
 
     main:
 
-        mergeBySample {decon_sr_reads}
+        // Group decontaminated reads by sample and collect all files per sample
+        decon_sr_reads
+            .map { meta, r1, r2 -> 
+                tuple(meta.sample, meta.pop, r1, r2)
+            }
+            .groupTuple(by: 0)  // Group by sample (index 0)
+            .map { sample_id, pop_list, r1_list, r2_list ->
+                // Take the first pop value since all should be the same for a sample
+                tuple(sample_id, pop_list[0], r1_list, r2_list)
+            }
+            .set { grouped_reads }
 
+        mergeBySample(grouped_reads)
 
-
+    emit:
+        merged_reads = mergeBySample.out.sample_merged
 }

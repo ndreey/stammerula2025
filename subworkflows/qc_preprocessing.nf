@@ -235,18 +235,10 @@ workflow QC_PREPROCESSING {
         FASTQ_STATS_LR_DECON(decon_lr)
 
         ////////////////////////////////////////////////////////////////////////////
-        // 6. Collect and emit the decontaminated reads
+        // 6. Emit the decontaminated reads (keep individual tuples for merging)
         ////////////////////////////////////////////////////////////////////////////
 
-        DECON_SR.out.decon_sr_reads
-            .collect()
-            .set { emit_decon_sr }
-        
-        DECON_LR.out.decon_lr_reads
-            .collect()
-            .set { emit_decon_lr }
-
     emit:
-        decon_sr_reads = emit_decon_sr
-        decon_lr_reads = emit_decon_lr
+        decon_sr_reads = DECON_SR.out.decon_sr_reads
+        decon_lr_reads = DECON_LR.out.decon_lr_reads
 }
