@@ -7,6 +7,8 @@ work/
 results/
 data/
 containers/
+*.tar.gz
+*.gz
 
 # Logs
 slurm-logs/

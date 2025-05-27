@@ -5,7 +5,8 @@ process mergeBySample {
     label 'stats'
     tag "mergeBySample-${sample_id}"
 
-    publishDir "${params.res.mergedSample}", mode: 'symlink', pattern: '*_R{1,2}.fq.gz'
+    publishDir "${params.res.mergedSample}", mode: 'symlink', 
+    pattern: '*_R{1,2}.fq.gz'
 
     container params.images.QC
 
@@ -13,7 +14,10 @@ process mergeBySample {
     tuple val(sample_id), val(pop), path(r1_files), path(r2_files)
 
     output:
-    path("*_R{1,2}.fq.gz"), emit: sample_merged
+    tuple val(sample_id), val(pop), 
+    path("${pop}_${sample_id}_R1.fq.gz"),
+    path("${pop}_${sample_id}_R2.fq.gz"), 
+    emit: sample_merged
 
     script:
     """

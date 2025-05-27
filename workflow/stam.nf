@@ -1,10 +1,10 @@
 #!/usr/bin/env nextflow
 
-
+include { DB_SETUP }                             from '../subworkflows/db-setup.nf'
 include { QC_PREPROCESSING }                        from '../subworkflows/qc_preprocessing.nf'
 include { FILE_MERGER }                             from '../subworkflows/merger.nf'
 include { META_ASSEMBLY }                           from '../subworkflows/meta-assembly.nf'
-//include { BINNING }                 from '../subworkflows/binning.nf'
+include { BINNING }                                 from '../subworkflows/binning.nf'
 
 workflow STAM_PIPELINE {
 
@@ -15,6 +15,8 @@ workflow STAM_PIPELINE {
         comp_headers
 
     main:
+
+        DB_SETUP{comp_ref}
 
         QC_PREPROCESSING(
             short_reads,
@@ -32,11 +34,11 @@ workflow STAM_PIPELINE {
             QC_PREPROCESSING.out.decon_lr_reads
         )
 
-        //BINNING(
-        //    assemblies           : ASSEMBLY.out.assemblies,
-        //    decont_trimmed_reads : QC_PREPROCESSING.out.decont_trimmed_reads,
-        //    metadata             : ASSEMBLY.out.meta
-        //)
+        BINNING(
+            META_ASSEMBLY.out.long_metagenome,
+            META_ASSEMBLY.out.short_metagenomes,
+            FILE_MERGER.out.merged_reads
+        )
 
     //emit:
     //    bins = BINNING.out.bins

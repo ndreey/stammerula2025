@@ -41,25 +41,22 @@ workflow FILE_MERGER {
         pop_grouped = all_decon_reads
             .map { meta, r1, r2 -> 
                 def pop_key = meta.pop
-                tuple(pop_key, meta, r1, r2)
+                tuple(pop_key, meta, r1, r2)  // Creates pop, meta, r1, r2 structure
             }
-            .groupTuple(by: 0)
+            .groupTuple(by: 0)              // Groups all tuples that have the same pop_key
             .map { pop_key, meta_list, r1_list, r2_list ->
                 // Extract just pop_id for the process
                 def pop_id = pop_key
-                tuple(pop_id, r1_list, r2_list)
+                tuple(pop_id, r1_list, r2_list) // Creates input structure
             }
 
-        pop_grouped.view()
         // Perform merging
         mergeBySample(sample_grouped)
         mergeByPop(pop_grouped)
 
         // Validation for sample-merged files
         sample_validation_input = mergeBySample.out.sample_merged
-            .map { files -> 
-                def r1 = files.find { it.name.contains('_R1') }
-                def r2 = files.find { it.name.contains('_R2') }
+            .map { sample_id, pop, r1, r2 -> 
                 tuple(r1, r2, "sample-merged")
             }
 
@@ -87,7 +84,8 @@ workflow FILE_MERGER {
 
         // Statistics collection
         sample_stats_input = mergeBySample.out.sample_merged
-            .collect()
+            .map { sample_id, pop, r1, r2 -> [r1, r2] }
+            .collect { it.flatten() }
             .map { files -> tuple(files, "sample-merged") }
 
         FASTQ_STATS_SAMPLE_MERGED(sample_stats_input)
