@@ -98,3 +98,4 @@ images:
   ALIGN: "oras://community.wave.seqera.io/library/bedtools_bwa_minimap2_picard_pruned:4abd28692b1e99f7"
   STATS: "oras://community.wave.seqera.io/library/bbmap_biopet-validatefastq_seqkit:a1c4fb2615ae72e6"
   ASSEMBLY: "oras://community.wave.seqera.io/library/megahit_metamdbg:6fcef2bb1a0bd3a9"
+  metaWRAP: "quay.io/biocontainers/metawrap:1.2--1"

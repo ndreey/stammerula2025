@@ -5,7 +5,8 @@ process mergeByPop {
     label 'stats'
     tag "mergeByPop-${pop_id}"
 
-    publishDir "${params.res.mergedPop}", mode: 'symlink', pattern: '*_R{1,2}.fq.gz'
+    publishDir "${params.res.mergedPop}", mode: 'symlink', 
+    pattern: '*_R{1,2}.fq.gz'
 
     container params.images.QC
 
@@ -13,7 +14,8 @@ process mergeByPop {
     tuple val(pop_id), path(r1_files), path(r2_files)
 
     output:
-    tuple val(pop_id), path("${pop_id}_R1.fq.gz"), path("${pop_id}_R2.fq.gz"), emit: pop_merged
+    tuple val(pop_id), path("${pop_id}_R1.fq.gz"), path("${pop_id}_R2.fq.gz"),
+    emit: pop_merged
 
     script:
     """

@@ -31,6 +31,7 @@ include { INDEX_MINIMAP2 }                              from '../modules/index-m
 include { DECON_SR }                                    from '../modules/decon-sr.nf'
 include { DECON_LR }                                    from '../modules/decon-lr.nf'
 
+
 workflow QC_PREPROCESSING {
 
     take:
