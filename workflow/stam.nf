@@ -16,7 +16,7 @@ workflow STAM_PIPELINE {
 
     main:
 
-        DB_SETUP{comp_ref}
+        //DB_SETUP{comp_ref}
 
         QC_PREPROCESSING(
             short_reads,
