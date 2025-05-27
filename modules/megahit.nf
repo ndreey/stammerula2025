@@ -14,7 +14,7 @@ process shortAssembly {
     tuple val(pop_id), path(r1), path(r2)
 
     output:
-    tuple val(pop_id), path("${pop_id}.contigs.fa"), path("${pop_id}.contigs.fastg"), emit: short_metagenomes
+    tuple val(pop_id), path("${pop_id}_k55/${pop_id}.contigs.fa"), path("${pop_id}.contigs.fastg"), emit: short_metagenomes
     
     script:
     """
