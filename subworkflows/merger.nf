@@ -14,96 +14,88 @@ include { MERGE_VALI_RES as MERGE_VALI_RES_POP }        from '../modules/validat
 include { FASTQ_STATS as FASTQ_STATS_SAMPLE_MERGED }    from '../modules/seq-stats.nf'
 include { FASTQ_STATS as FASTQ_STATS_POP_MERGED }       from '../modules/seq-stats.nf'
 
-
 workflow FILE_MERGER {
 
     take:
         decon_sr_reads
 
     main:
+        // Ensure all decontamination is complete before proceeding
+        all_decon_reads = decon_sr_reads.collect().flatten().collate(3)
 
-        // Collect all decontaminated reads first to ensure complete data
-        decon_sr_reads
-            .collect()
-            .flatten()
-            .set { all_decon_reads }
-
-        // Group decontaminated reads by sample and collect all files per sample
-        all_decon_reads
+        // Group by sample - format for mergeBySample process
+        sample_grouped = all_decon_reads
             .map { meta, r1, r2 -> 
-                tuple(meta.sample, meta.pop, r1, r2)
+                def sample_key = meta.sample
+                tuple(sample_key, meta, r1, r2)
             }
-            .groupTuple(by: 0)  // Group by sample
-            .map { sample_id, pop_list, r1_list, r2_list ->
-                // Take the first pop value since all is the same for a sample
-                tuple(sample_id, pop_list[0], r1_list, r2_list)
+            .groupTuple(by: 0)
+            .map { sample_key, meta_list, r1_list, r2_list ->
+                // Extract sample_id and pop for the process
+                def sample_id = sample_key
+                def pop = meta_list[0].pop  // All entries should have same pop for a sample
+                tuple(sample_id, pop, r1_list, r2_list)
             }
-            .set { grouped_reads }
 
-        mergeBySample(grouped_reads)
-
-        // Group decontaminated reads by population and collect all files per population
-        all_decon_reads
+        // Group by population - format for mergeByPop process
+        pop_grouped = all_decon_reads
             .map { meta, r1, r2 -> 
-                tuple(meta.pop, r1, r2)
+                def pop_key = meta.pop
+                tuple(pop_key, meta, r1, r2)
             }
-            .groupTuple(by: 0)  // Group by population
-            .map { pop_id, r1_list, r2_list ->
+            .groupTuple(by: 0)
+            .map { pop_key, meta_list, r1_list, r2_list ->
+                // Extract just pop_id for the process
+                def pop_id = pop_key
                 tuple(pop_id, r1_list, r2_list)
             }
-            .set { grouped_by_pop }
 
-        mergeByPop(grouped_by_pop)
+        pop_grouped.view()
+        // Perform merging
+        mergeBySample(sample_grouped)
+        mergeByPop(pop_grouped)
 
-        // Validate merged sample reads (simplified - no metadata needed)
-        mergeBySample.out.sample_merged
+        // Validation for sample-merged files
+        sample_validation_input = mergeBySample.out.sample_merged
             .map { files -> 
                 def r1 = files.find { it.name.contains('_R1') }
                 def r2 = files.find { it.name.contains('_R2') }
                 tuple(r1, r2, "sample-merged")
             }
-            .set { sample_validation_input }
 
         VALIDATE_PE_SAMPLE(sample_validation_input)
-
-        VALIDATE_PE_SAMPLE.out.validate
+        
+        sample_validate_results = VALIDATE_PE_SAMPLE.out.validate
             .collect()
             .map { files -> tuple(files, "sample-merged") }
-            .set { sample_validate_results }
 
         MERGE_VALI_RES_SAMPLE(sample_validate_results)
 
-        // Validate merged population reads (simplified - no metadata needed)
-        mergeByPop.out.pop_merged
+        // Validation for population-merged files
+        pop_validation_input = mergeByPop.out.pop_merged
             .map { pop_id, r1, r2 -> 
                 tuple(r1, r2, "pop-merged")
             }
-            .set { pop_validation_input }
 
         VALIDATE_PE_POP(pop_validation_input)
-
-        VALIDATE_PE_POP.out.validate
+        
+        pop_validate_results = VALIDATE_PE_POP.out.validate
             .collect()
             .map { files -> tuple(files, "pop-merged") }
-            .set { pop_validate_results }
 
         MERGE_VALI_RES_POP(pop_validate_results)
 
-        // Get statistics for sample-merged files
-        mergeBySample.out.sample_merged
+        // Statistics collection
+        sample_stats_input = mergeBySample.out.sample_merged
             .collect()
             .map { files -> tuple(files, "sample-merged") }
-            .set { sample_stats_input }
 
         FASTQ_STATS_SAMPLE_MERGED(sample_stats_input)
 
-        // Get statistics for population-merged files
-        mergeByPop.out.pop_merged
+        pop_stats_input = mergeByPop.out.pop_merged
             .map { pop_id, r1, r2 -> [r1, r2] }
-            .flatten()
-            .collect()
+            .collect { it.flatten() }
             .map { files -> tuple(files, "pop-merged") }
-            .set { pop_stats_input }
 
         FASTQ_STATS_POP_MERGED(pop_stats_input)
 
