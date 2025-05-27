@@ -19,7 +19,7 @@ process longAssembly {
     
     script:
     """
-    echo "[INFO]        Assembly following reads with metaMDBG:"
+    echo "[INFO]        Assembly following reads with metaMDBG"
     for read in ${long_reads}; do
         echo "[INFO]            \$(basename \$read)"
     done
