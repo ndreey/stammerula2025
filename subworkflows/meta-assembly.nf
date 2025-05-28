@@ -3,24 +3,31 @@
 include { longAssembly }                                        from '../modules/metamdbg.nf'
 include { shortAssembly }                                       from '../modules/megahit.nf'
 
-
 workflow META_ASSEMBLY {
 
     take:
-        pop_reads
-        long_reads
+        pop_reads      // From FILE_MERGER.out.merged_pops
+        long_reads     // From QC_PREPROCESSING.out.decon_lr_reads
     
     main:
-
         // Collect all long reads for metaMDBG assembly
-        long_reads
+        collected_lr = long_reads
             .map { meta, read -> read }
             .collect()
-            .set { collected_lr }
-        
-        longAssembly(collected_lr)
+      
+        // Extract metadata from first long read (all are same pop/sample)
+        meta_lr = long_reads
+            .map { meta, read -> tuple(meta.pop, meta.sample) }
+            .first()
 
-        // Use population reads directly (now includes pop_id from mergeByPop)
+        // Combine metadata and collected reads for longAssembly
+        assembly_input = meta_lr
+            .combine(collected_lr)
+            .map { pop, sample, reads ->
+                tuple(pop, sample, reads)
+            }
+        
+        longAssembly(assembly_input)
         shortAssembly(pop_reads)
 
     emit:
