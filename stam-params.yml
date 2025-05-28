@@ -100,4 +100,5 @@ images:
   ALIGN: "oras://community.wave.seqera.io/library/bedtools_bwa_minimap2_picard_pruned:4abd28692b1e99f7"
   STATS: "oras://community.wave.seqera.io/library/bbmap_biopet-validatefastq_seqkit:a1c4fb2615ae72e6"
   ASSEMBLY: "oras://community.wave.seqera.io/library/megahit_metamdbg:6fcef2bb1a0bd3a9"
+  #metaWRAP: "https://depot.galaxyproject.org/singularity/metawrap:1.0--0"
   metaWRAP: "./containers/metawrap_final.sif"
