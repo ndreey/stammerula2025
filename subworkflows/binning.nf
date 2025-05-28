@@ -1,35 +1,37 @@
 #!/usr/bin/env nextflow
 
 include { metaWRAPbinning }                                     from '../modules/binning-metaWRAP.nf'
+include { binRefinement }                                       from '../modules/bin-refinement.nf'
 
 workflow BINNING {
 
     take:
-        long_metagenome
-        short_metagenomes  
-        merged_pops        // This now contains population-level merged reads
+        long_metagenome    // [pop, sample, metagenome_file] - single item  
+        merged_pops        // [pop_id, r1, r2]
     
     main:
-        // Filter merged_pops to only include CHSK population
-        chsk_reads = merged_pops
-            .filter { pop_id, r1, r2 -> 
-                pop_id == "CHSK"  // Only keep CHSK population reads
-            }
-            .map { pop_id, r1, r2 -> 
-                tuple(r1, r2)  // Extract just the read files
-            }
+        // Extract population from the single long metagenome
+        target_pop = long_metagenome.map { pop, sample, file -> pop }
 
-        // Combine long metagenome with CHSK short reads for binning
+        // Filter merged_pops for matching population
+        matching_reads = merged_pops
+            .combine(target_pop)
+            .filter { pop_id, r1, r2, target -> pop_id == target }
+            .map { pop_id, r1, r2, target -> tuple(r1, r2) }
+
+        // Combine for binning
         bin_input = long_metagenome
-            .combine(chsk_reads)
-            .map { long_meta_tuple, r1, r2 ->
-                // Extract the metagenome file from long_metagenome
-                def metagenome_file = long_meta_tuple[1]  // Assuming [meta, file] structure
-                tuple(metagenome_file, r1, r2)
+            .combine(matching_reads)
+            .map { pop, sample, metagenome, r1, r2 ->
+                tuple("${pop}-${sample}", metagenome, r1, r2)
             }
 
         metaWRAPbinning(bin_input)
 
+        // metaWRAPbinning output is exactly what binRefinement needs!
+        binRefinement(metaWRAPbinning.out.bin_dirs)
+
     emit:
-        bins = metaWRAPbinning.out.bin_dirs
+        raw_bins = metaWRAPbinning.out.bin_dirs
+        refined_bins = binRefinement.out.refined_bins
 }

@@ -1,10 +1,12 @@
+#!/usr/bin/env nextflow
+
 process metaWRAPbinning {
 
-    label "metaWRAP_binning"
-    tag "metaWRAP-binning"
+    label "metaWRAP"
+    tag "metaWRAP-binning-${id}"
 
-    publishDir "${params.res.binning}/06-metaWRAP-bins/${id}", mode: 'symlink', pattern: 'binning_results'
-    publishDir "${params.res.binning}/logs", mode: 'symlink', pattern: '*.log'
+    publishDir "${params.res.binning}/${id}", 
+    mode: 'symlink', pattern: 'binning_results'
 
     container params.images.metaWRAP
 
@@ -12,22 +14,20 @@ process metaWRAPbinning {
     tuple val(id), path(metagenome), path(read1), path(read2)
 
     output:
-    path("binning_results"), emit: bin_dirs
-    path("binning_results/metabat2_bins"), emit: metabat2_bins, optional: true
-    path("binning_results/maxbin2_bins"), emit: maxbin2_bins, optional: true
-    path("binning_results/concoct_bins"), emit: concoct_bins, optional: true
-    path("*.log"), emit: logs, optional: true
+    tuple val(id), path("binning_results/concoct_bins"), 
+    path("binning_results/maxbin2_bins"), path("binning_results/metabat2_bins"), 
+    emit: bin_dirs, optional: true
     
     script:
     """
-    echo "[INFO] Starting metaWRAP binning with:"
+    echo "[INFO] Starting metaWRAP binning for ${id} with:"
     echo "  Metagenome: ${metagenome}"
     echo "  R1 reads: ${read1}"
     echo "  R2 reads: ${read2}"
 
     # Create temporary uncompressed fastq files
-    R1_TEMP=\$(basename ${read1} .gz)
-    R2_TEMP=\$(basename ${read2} .gz)
+    R1_TEMP="\$(basename ${read1} .fq.gz).fastq"
+    R2_TEMP="\$(basename ${read2} .fq.gz).fastq"
 
     echo "[INFO] Decompressing reads..."
     zcat ${read1} > \$R1_TEMP
@@ -38,17 +38,16 @@ process metaWRAPbinning {
         -a ${metagenome} \\
         -o binning_results \\
         -t ${task.cpus} \\
-        -m ${task.memory.toGiga()} \\
+        -m 64 \\
         -l 2500 \\
         --metabat2 \\
         --maxbin2 \\
         --concoct \\
-        \$R1_TEMP \$R2_TEMP 2>&1 | tee metawrap_binning.log
+        \$R1_TEMP \$R2_TEMP
 
     # Clean up temporary files
     rm \$R1_TEMP \$R2_TEMP
 
-    echo "[FINISH] metaWRAP binning complete"
-    echo "[INFO] Results saved in binning_results/"
+    echo "[FINISH] metaWRAP binning complete for ${id}"
     """
 }

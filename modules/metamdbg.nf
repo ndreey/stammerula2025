@@ -4,22 +4,22 @@ process longAssembly {
 
     label "metamdbg"
 
-    tag "lr-metagenome-assembly"
+    tag "metamdbg-${pop}-${sample}"
 
-    publishDir "${params.res.metagenome}/01-metamdbg", mode: 'symlink', pattern: 'contigs.fasta.gz'
-    publishDir "${params.res.metagenome}/01-metamdbg", mode: 'symlink', pattern: '*.log'
+    publishDir "${params.res.metagenome}/01-metamdbg", mode: 'symlink', pattern: '*.contigs.fa.gz'
 
     container params.images.ASSEMBLY
 
     input:
-    path(long_reads)
+    tuple val(pop), val(sample), path(long_reads)
 
     output:
-    path("contigs.fasta.gz"), emit: long_metagenome
+    tuple val(pop), val(sample), path("${pop}-${sample}.contigs.fa.gz"),
+    emit: long_metagenome
     
     script:
     """
-    echo "[INFO]        Assembly following reads with metaMDBG"
+    echo "[INFO]        Long read assembly with metaMDBG for ${pop}-${sample}"
     for read in ${long_reads}; do
         echo "[INFO]            \$(basename \$read)"
     done
@@ -28,7 +28,9 @@ process longAssembly {
         --out-dir . \\
         --in-hifi ${long_reads.join(' ')} \\
         --threads ${task.cpus}
-
-    echo "[FINISH]      Assembly complete"
+   
+    mv contigs.fasta.gz ${pop}-${sample}.contigs.fa.gz
+    
+    echo "[FINISH]      Assembly complete for ${pop}-${sample}"
     """
 }

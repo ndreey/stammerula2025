@@ -36,8 +36,7 @@ workflow STAM_PIPELINE {
 
         BINNING(
             META_ASSEMBLY.out.long_metagenome,
-            META_ASSEMBLY.out.short_metagenomes,
-            FILE_MERGER.out.merged_reads
+            FILE_MERGER.out.merged_pops
         )
 
     //emit:
