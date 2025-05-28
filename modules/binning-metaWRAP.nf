@@ -47,6 +47,7 @@ process metaWRAPbinning {
         -m 64 \\
         -l 2500 \\
         --metabat2 \\
+        --maxbin2 \\
         --concoct \\
         \$R1_TEMP \$R2_TEMP
 
