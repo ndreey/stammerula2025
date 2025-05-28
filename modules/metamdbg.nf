@@ -7,7 +7,6 @@ process longAssembly {
     tag "metamdbg-${pop}-${sample}"
 
     publishDir "${params.res.metagenome}/01-metamdbg", mode: 'symlink', pattern: '*.contigs.fa.gz'
-    publishDir "${params.res.metagenome}/01-metamdbg", mode: 'symlink', pattern: '*.log'
 
     container params.images.ASSEMBLY
 

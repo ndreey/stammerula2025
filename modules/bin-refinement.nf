@@ -28,7 +28,3 @@ process binRefinement {
         -x 10
     """
 }
-
-
-
-

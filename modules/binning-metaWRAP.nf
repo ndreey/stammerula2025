@@ -14,10 +14,9 @@ process metaWRAPbinning {
     tuple val(id), path(metagenome), path(read1), path(read2)
 
     output:
-    path("binning_results/metabat2_bins"), emit: metabat2_bin_dir, optional: true
-    path("binning_results/maxbin2_bins"), emit: maxbin2_bin_dir, optional: true
-    path("binning_results/concoct_bins"), emit: concoct_bin_dir, optional: true
-    path("*.log"), emit: logs, optional: true
+    tuple val(id), path("binning_results/concoct_bins"), 
+    path("binning_results/maxbin2_bins"), path("binning_results/metabat2_bins"), 
+    emit: bin_dirs, optional: true
     
     script:
     """

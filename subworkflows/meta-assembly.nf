@@ -32,5 +32,5 @@ workflow META_ASSEMBLY {
 
     emit:
         long_metagenome = longAssembly.out.long_metagenome
-        short_metagenomes = shortAssembly.out.short_metagenomes
+        //short_metagenomes = shortAssembly.out.short_metagenomes
 }

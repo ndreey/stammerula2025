@@ -1,13 +1,10 @@
-#!/usr/bin/env nextflow
-
 process shortAssembly {
 
     label "megahit"
-
     tag "sr-metagenome-assembly-${pop_id}"
 
     publishDir "${params.res.metagenome}/02-megahit/${pop_id}", mode: 'symlink', pattern: '*.fastg'
-    publishDir "${params.res.metagenome}/02-megahit/${pop_id}", mode: 'symlink', pattern: '*/*.{fa,log}'
+    publishDir "${params.res.metagenome}/02-megahit/${pop_id}", mode: 'symlink', pattern: '*.contigs.fa'
 
     container params.images.ASSEMBLY
 
@@ -15,14 +12,13 @@ process shortAssembly {
     tuple val(pop_id), path(r1), path(r2)
 
     output:
-    tuple val(pop_id), path("${pop_id}/${pop_id}.contigs.fa"), 
-    path("${pop_id}.contigs.fastg"), emit: short_metagenomes
+    tuple val(pop_id), path("${pop_id}.contigs.fa"), path("${pop_id}.contigs.fastg"), emit: short_metagenomes
     
     script:
     """
-    echo "[INFO]        Assembly following reads with MEGAHIT for population: ${pop_id}"
-    echo "[INFO]            R1: \$(basename ${r1})"
-    echo "[INFO]            R2: \$(basename ${r2})"
+    echo "[INFO] Assembly following reads with MEGAHIT for population: ${pop_id}"
+    echo "[INFO]     R1: \$(basename ${r1})"
+    echo "[INFO]     R2: \$(basename ${r2})"
 
     # Assembling the metagenome
     megahit \\
@@ -35,10 +31,12 @@ process shortAssembly {
         -o ${pop_id} \\
         --out-prefix ${pop_id}
 
-    # Generate fastg file
-    megahit_toolkit contig2fastg 55 ${pop_id}_k55/intermediate_contigs/k55.contigs.fa > ${pop_id}.contigs.fastg
+    # Copy contigs to work directory root for easier publishing
+    cp ${pop_id}/${pop_id}.contigs.fa ${pop_id}.contigs.fa
 
-    
-    echo "[FINISH]      Assembly complete for ${pop_id}"
+    # Generate fastg file
+    megahit_toolkit contig2fastg 55 ${pop_id}/intermediate_contigs/k55.contigs.fa > ${pop_id}.contigs.fastg
+
+    echo "[FINISH] Assembly complete for ${pop_id}"
     """
 }
