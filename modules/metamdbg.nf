@@ -14,8 +14,7 @@ process longAssembly {
     tuple val(pop), val(sample), path(long_reads)
 
     output:
-    tuple val(pop), val(sample), path("${pop}-${sample}.contigs.fa.gz"),
-    emit: long_metagenome
+    tuple val(pop), val(sample), path("${pop}-${sample}.contigs.fa.gz"), emit: long_metagenome
     
     script:
     """
