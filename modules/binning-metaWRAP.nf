@@ -26,16 +26,22 @@ process metaWRAPbinning {
     echo "  R2 reads: ${read2}"
 
     # Create temporary uncompressed fastq files
-    R1_TEMP="\$(basename ${read1} .fq.gz).fastq"
-    R2_TEMP="\$(basename ${read2} .fq.gz).fastq"
+    R1_TEMP="\$(basename ${read1} _R1.fq.gz)_1.fastq"
+    R2_TEMP="\$(basename ${read2} _R2.fq.gz)_2.fastq"
+    METAGENOME=metagenome.fa
+
+    echo "metaWRAP friendly reads: \$R1_TEMP \$R2_TEMP"
 
     echo "[INFO] Decompressing reads..."
     zcat ${read1} > \$R1_TEMP
     zcat ${read2} > \$R2_TEMP
 
+    echo "Decompressing metagenome to metaWRAP friendly format:"
+    zcat ${metagenome} > \$METAGENOME
+
     echo "[INFO] Running metaWRAP binning..."
     metawrap binning \\
-        -a ${metagenome} \\
+        -a \$METAGENOME \\
         -o binning_results \\
         -t ${task.cpus} \\
         -m 64 \\
@@ -46,7 +52,7 @@ process metaWRAPbinning {
         \$R1_TEMP \$R2_TEMP
 
     # Clean up temporary files
-    rm \$R1_TEMP \$R2_TEMP
+    #rm \$R1_TEMP \$R2_TEMP
 
     echo "[FINISH] metaWRAP binning complete for ${id}"
     """

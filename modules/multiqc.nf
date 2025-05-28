@@ -11,8 +11,8 @@ process MULTIQC {
     file('reports/*')
 
     output:
-    path "multiqc_report.html"
-    path "multiqc_data"
+    tuple path("multiqc_report.html"), path("multiqc_data"), 
+    emit:multiqc_report
 
     script:
     """
