@@ -2,7 +2,7 @@
 
 process INDEX_MINIMAP2 {
 
-    label 'minimap2_index'
+    label 'index'
     tag "${comp_ref.simpleName}"
 
     publishDir 'data/comp_ref', mode: 'copy', overwrite: false, pattern: "*.mmi"

@@ -2,7 +2,7 @@
 
 process BWA_INDEX_COMP_REF {
 
-    label 'bwa_index'
+    label 'index'
     tag "${comp_ref.simpleName}"
 
     publishDir 'data/comp_ref', mode: 'copy', overwrite: false, pattern: "*.{amb,ann,bwt,pac,sa}"
