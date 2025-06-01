@@ -1,2 +1,4 @@
 POP,SAMPLE,CELL,READ
-CHSK,pt_042,cell2,data/hifi-ccs-raw/pt_042_001_cell1.subseq.fastq.gz
+CHSK,pt_042,cell1,../../../data/reference/hifiasm_Assemb2020_pt_042/pt_042/ccsreads/pt_042_001/pt_042_001_cell1.ccsreads.fastq.gz
+CHSK,pt_042,cell2,../../../data/reference/hifiasm_Assemb2020_pt_042/pt_042/ccsreads/pt_042_001/pt_042_001_cell2.ccsreads.fastq.gz
+CHSK,pt_042,cell3,../../../data/reference/hifiasm_Assemb2020_pt_042/pt_042/ccsreads/pt_042_001/pt_042_001_cell3.ccsreads.fastq.gz

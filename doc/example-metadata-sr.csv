@@ -1,0 +1,6 @@
+POP,HP,REG,regHP,SAMPLE,LANE,READ1,READ2
+CHSK,CH,west,westCH,P12002_101,S13_L002,data/sr-raw/P12002_101_S13_L002_R1_001.fastq.gz,data/sr-raw/P12002_101_S13_L002_R2_001.fastq.gz
+CHSK,CH,west,westCH,P12002_101,S13_L005,data/sr-raw/P12002_101_S13_L005_R1_001.fastq.gz,data/sr-raw/P12002_101_S13_L005_R2_001.fastq.gz
+CHSK,CH,west,westCH,P12002_101,S13_L008,data/sr-raw/P12002_101_S13_L008_R1_001.fastq.gz,data/sr-raw/P12002_101_S13_L008_R2_001.fastq.gz
+CHES,CH,west,westCH,P12002_145,S94_L004,data/sr-raw/P12002_145_S94_L004_R1_001.fastq.gz,data/sr-raw/P12002_145_S94_L004_R2_001.fastq.gz
+CHES,CH,west,westCH,P12002_145,S94_L007,data/sr-raw/P12002_145_S94_L007_R1_001.fastq.gz,data/sr-raw/P12002_145_S94_L007_R2_001.fastq.gz
