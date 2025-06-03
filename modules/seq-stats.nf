@@ -26,5 +26,7 @@ process FASTQ_STATS {
         --tabular \\
         --basename \\
         reads/* > ${id}-seq-stats.tsv
+    
+    rm -r reads/
     """
 }

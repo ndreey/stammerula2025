@@ -18,4 +18,4 @@ ml load nextflow/24.04.2
 
 
 
-nextflow run main.nf -params-file stam-params.yml -profile slurm
+nextflow run main.nf -params-file stam-params.yml -profile slurm -resume
