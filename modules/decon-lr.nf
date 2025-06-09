@@ -34,7 +34,8 @@ process DECON_LR {
     CONT_TXT=\${ID}-cont-reads.txt
     CLEAN_RAW_BAM=\${ID}-clean.bam
     CLEAN_SORTED_BAM=\${ID}-clean.sorted.bam
-    READ_OUT=\${ID}-clean.fq
+    READ_OUT=\${ID}-decon.fq
+    READ_CLEAN=\${ID}-clean.fq.gz
 
     echo "[INFO]		Align to competetive reference"
     minimap2 \\
@@ -66,7 +67,10 @@ process DECON_LR {
     bedtools bamtofastq -i \$CLEAN_SORTED_BAM -fq \$READ_OUT
     pigz -p \$CPU \$READ_OUT
 
+    # Remove potential dupes due to multiple BAM records.
+    pigz -dc -p \$CPU \$READ_OUT | seqkit rmdup --by-name -o \$READ_CLEAN
+
     echo "[INFO]		Remove the temporary files"
-    rm \$CONT_BAM \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM
+    rm \$CONT_BAM \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM "\${READ_OUT}.gz"
     """
 }

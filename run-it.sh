@@ -18,5 +18,7 @@
 ml load PDC/24.11
 ml load apptainer/1.4.0-cpeGNU-24.11
 ml load nextflow/24.04.2
+ml load bioinfo-tools
+ml load Graphviz/9.0.0
 
 nextflow run main.nf -params-file stam-params.yml -profile slurm -resume

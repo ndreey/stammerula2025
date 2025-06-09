@@ -29,9 +29,11 @@ process DECON_SR {
     CONT_TXT="${meta.sample}_${meta.lane}-comp-reads.txt"
     CLEAN_RAW_BAM="${meta.sample}_${meta.lane}-clean.bam"
     CLEAN_SORTED_BAM="${meta.sample}_${meta.lane}-clean.sorted.bam"
-    R1_OUT="${meta.sample}_${meta.lane}_R1-clean.fq.gz"
-    R2_OUT="${meta.sample}_${meta.lane}_R2-clean.fq.gz"
+    R1_OUT="${meta.sample}_${meta.lane}_R1-decon.fq.gz"
+    R2_OUT="${meta.sample}_${meta.lane}_R2-decon.fq.gz"
     SINGLETONS_OUT="${meta.sample}_${meta.lane}_singletons.fq.gz"
+    R1_CLEAN="${meta.sample}_${meta.lane}_R1-clean.fq.gz"
+    R2_CLEAN="${meta.sample}_${meta.lane}_R2-clean.fq.gz"
 
 	echo "[INFO]		Align against competetive reference"
     bwa mem \\
@@ -60,8 +62,12 @@ process DECON_SR {
         -s \$SINGLETONS_OUT \\
         -0 /dev/null \$CLEAN_SORTED_BAM
 
+    # Removing dupes if existing
+    pigz -dc -p ${task.cpus} \$R1_OUT | seqkit rmdup --by-name -o \$R1_CLEAN
+    pigz -dc -p ${task.cpus} \$R2_OUT | seqkit rmdup --by-name -o \$R2_CLEAN
+
 	echo "[INFO]		Remove the temporary files"
-    rm \$CONT_BAM \$CONT_BAM.csi \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM
+    rm \$CONT_BAM \$CONT_BAM.csi \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM \$R1_OUT \$R2_OUT
     """
 }
 
