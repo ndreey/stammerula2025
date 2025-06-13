@@ -12,9 +12,10 @@ process DECON_SR {
 
     input:
     tuple val(meta), path(read1), path(read2)
-	path(index_files)
-	path(comp_ref)
-    path(comp_headers)
+    path comp_ref_dir
+    val comp_ref
+    path comp_headers
+
 
     output:
     tuple val(meta),
@@ -36,7 +37,7 @@ process DECON_SR {
 	echo "[INFO]		Align against competetive reference"
     bwa mem \\
         -R "@RG\\tID:${meta.sample}_${meta.lane}\\tSM:${meta.sample}_${meta.lane}\\tPL:ILLUMINA" \\
-        -t ${task.cpus} ${comp_ref} ${read1} ${read2} | \\
+        -t ${task.cpus} ${comp_ref_dir}/${comp_ref} ${read1} ${read2} | \\
         samtools view -h -b -@ ${task.cpus} | \\
         samtools sort -@ ${task.cpus} --write-index -o \$CONT_BAM -
 

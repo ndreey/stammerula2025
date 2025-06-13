@@ -24,9 +24,10 @@ metadata:
 
 references:
   comp:
-    fasta: "../MAG-MAYHEM/data/comp_ref/competitive-ref.fasta"
+    dir: "data/comp_ref"
+    fasta: "competitive-ref.fasta"
     headers: "doc/hh-headers.txt"
-    index: "data/comp_ref/competitive-ref.fasta.gz.bwt"  # optional precomputed index
+
 
 # Process params
 fastqc_raw:

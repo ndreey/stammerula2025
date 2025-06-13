@@ -1,2 +1,3 @@
 POP,SAMPLE,CELL,READ
-CHSK,pt_042,cell2,data/hifi-ccs-raw/pt_042_001_cell1.subseq.fastq.gz
+CHSK,pt_042,cell1,data/hifi-ccs-raw/pt_042_001_cell1.subseq.fastq.gz
+CHSK,pt_042,cell2,data/hifi-ccs-raw/pt_042_001_cell2.subseq.fastq.gz

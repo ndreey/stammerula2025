@@ -7,50 +7,30 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { STAM_PIPELINE }                       from './workflow/stam.nf'
+include { INIT }          from './subworkflows/init.nf'
+include { STAM_PIPELINE } from './workflow/stam.nf'
 
+// Generate timestamp to label results/output folders
 params.timestamp = new Date().format('yyyyMMdd-HH-mm-ss')
 
 workflow {
 
-    //Load short-read metadata from CSV
-    short_reads_ch = Channel
-        .fromPath(params.metadata.sr, checkIfExists: true)
-        .splitCsv(header: true)
-        .map { row ->
-            def meta = [
-                pop     : row.POP,
-                hp      : row.HP,
-                reg     : row.REG,
-                reghp   : row.regHP,
-                sample  : row.SAMPLE,
-                lane    : row.LANE
-            ]
-            tuple(meta, file(row.READ1), file(row.READ2))
-        }
+    // Run init subworkflow to prepare input data
+    def init_outputs = INIT()
 
-    // Load long-read metadata from CSV
-    long_reads_ch = Channel
-        .fromPath(params.metadata.lr, checkIfExists: true)
-        .splitCsv(header: true)
-        .map { row ->
-            def meta = [
-                pop     : row.POP,
-                sample  : row.SAMPLE,
-                lane    : row.CELL
-            ]
-            tuple(meta, file(row.READ))
-        }
+    // Destructure emitted channels
+    def short_reads_ch      = init_outputs.short_reads
+    def long_reads_ch       = init_outputs.long_reads
+    def comp_ref_dir_ch     = init_outputs.comp_ref_dir
+    def comp_ref_ch         = init_outputs.comp_ref
+    def comp_headers_ch     = init_outputs.comp_headers
 
-    // Load contamination reference and headers from params
-    comp_ref = Channel.value(file(params.references.comp.fasta))
-    comp_headers = Channel.value(file(params.references.comp.headers))
-
-    // Launch the main pipeline logic
+    // Launch main analysis logic
     STAM_PIPELINE(
         short_reads_ch,
         long_reads_ch,
-        comp_ref,
-        comp_headers
+        comp_ref_dir_ch,
+        comp_ref_ch,
+        comp_headers_ch
     )
 }
