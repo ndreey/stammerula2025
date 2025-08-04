@@ -6,9 +6,9 @@ process metaWRAPbinning {
     tag "metaWRAP-binning-${id}"
 
     publishDir "${params.res.binning}/${id}", 
-    mode: 'symlink', pattern: 'binning_results'
+    mode: 'symlink', pattern: 'binning_results/*_bins'
 
-    container params.images.metaWRAP
+    //container params.images.metaWRAP
 
     input:
     tuple val(id), path(metagenome), path(read1), path(read2)
@@ -20,6 +20,17 @@ process metaWRAPbinning {
     
     script:
     """
+    # Load modules
+    ml load PDCOLD/23.12
+    ml load bioinfo-tools
+    ml load CONCOCT/1.1.0
+    ml load MaxBin/2.2.7   # Maxbin2
+    ml load metabat/2.15   # MetaBat2
+    ml load bwa/0.7.17
+    ml load samtools/1.20
+    ml load hmmer/3.4-cpeGNU-23.12
+    ml load checkm/1.2.2-cpeGNU-23.12
+
     echo "[INFO] Starting metaWRAP binning for ${id} with:"
     echo "  Metagenome: ${metagenome}"
     echo "  R1 reads: ${read1}"
@@ -47,6 +58,7 @@ process metaWRAPbinning {
         -m 64 \\
         -l 2500 \\
         --metabat2 \\
+        --maxbin2 \\
         --concoct \\
         \$R1_TEMP \$R2_TEMP
 

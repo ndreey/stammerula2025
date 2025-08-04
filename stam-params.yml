@@ -19,28 +19,27 @@ res:
 
 # Init params
 metadata:
-  sr: "doc/metadata-sr.csv"
-  lr: "doc/metadata-lr.csv"
+  sr: "doc/test-sr.csv"
+  lr: "doc/test-lr.csv"
 
+# Reference genomes
 references:
   comp:
-    fasta: "../MAG-MAYHEM/data/comp_ref/competitive-ref.fasta"
+    dir: "data/comp_ref"
+    fasta: "competitive-ref.fasta"
     headers: "doc/hh-headers.txt"
-    index: "data/comp_ref/competitive-ref.fasta.gz.bwt"  # optional precomputed index
 
-# Process params
-fastqc_raw:
-  input: "data/sr-raw/*.fastq.gz"
-
-fastqc_ccs:
-  input: "data/hifi-ccs-raw/*.fastq.gz"
-
+# Trimming parameters
 trim:
-  input: "data/sr-raw/*_R{1,2}_001.fastq.gz"
   avg_qual: 20
   len_req: 36
 
-
+# Database paths
+db:
+  checkm2: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/CheckM2_database/uniref100.KO.1.dmnd"
+  bakta: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/databases/bakta-db_v6/db"
+  busco: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/"
+  GTDBtk: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/"
 
 
 
@@ -75,6 +74,7 @@ trim:
 #   - bioconda::minimap2=2.29
 #   - bioconda::picard=3.4.0
 #   - bioconda::samtools=1.20
+#   - bioconda::seqkit=2.10.0
 #   - conda-forge::pigz=2.8
 #
 # STATS: Sequence statistics programs (created 2025-05-22)
@@ -97,7 +97,7 @@ trim:
 
 images:
   QC: "oras://community.wave.seqera.io/library/bbmap_bwa_fastp_fastqc_pruned:676e8c82ba1c1ecb"
-  ALIGN: "oras://community.wave.seqera.io/library/bedtools_bwa_minimap2_picard_pruned:4abd28692b1e99f7"
+  ALIGN: "oras://community.wave.seqera.io/library/bedtools_bwa_minimap2_picard_pruned:7307bc2358e45de6"
   STATS: "oras://community.wave.seqera.io/library/bbmap_biopet-validatefastq_seqkit:a1c4fb2615ae72e6"
   ASSEMBLY: "oras://community.wave.seqera.io/library/megahit_metamdbg:6fcef2bb1a0bd3a9"
   #metaWRAP: "https://depot.galaxyproject.org/singularity/metawrap:1.0--0"

@@ -12,9 +12,10 @@ process DECON_SR {
 
     input:
     tuple val(meta), path(read1), path(read2)
-	path(index_files)
-	path(comp_ref)
-    path(comp_headers)
+    path comp_ref_dir
+    val comp_ref
+    path comp_headers
+
 
     output:
     tuple val(meta),
@@ -25,18 +26,21 @@ process DECON_SR {
     script:
     """
 	echo "[INFO]		Defining inputs"
+    CONT_REF="${comp_ref_dir}/${comp_ref}"
     CONT_BAM="${meta.sample}_${meta.lane}.comp.sorted.bam"
     CONT_TXT="${meta.sample}_${meta.lane}-comp-reads.txt"
     CLEAN_RAW_BAM="${meta.sample}_${meta.lane}-clean.bam"
     CLEAN_SORTED_BAM="${meta.sample}_${meta.lane}-clean.sorted.bam"
-    R1_OUT="${meta.sample}_${meta.lane}_R1-clean.fq.gz"
-    R2_OUT="${meta.sample}_${meta.lane}_R2-clean.fq.gz"
+    R1_OUT="${meta.sample}_${meta.lane}_R1-decon.fq.gz"
+    R2_OUT="${meta.sample}_${meta.lane}_R2-decon.fq.gz"
     SINGLETONS_OUT="${meta.sample}_${meta.lane}_singletons.fq.gz"
+    R1_CLEAN="${meta.sample}_${meta.lane}_R1-clean.fq.gz"
+    R2_CLEAN="${meta.sample}_${meta.lane}_R2-clean.fq.gz"
 
 	echo "[INFO]		Align against competetive reference"
     bwa mem \\
         -R "@RG\\tID:${meta.sample}_${meta.lane}\\tSM:${meta.sample}_${meta.lane}\\tPL:ILLUMINA" \\
-        -t ${task.cpus} ${comp_ref} ${read1} ${read2} | \\
+        -t ${task.cpus} \$CONT_REF ${read1} ${read2} | \\
         samtools view -h -b -@ ${task.cpus} | \\
         samtools sort -@ ${task.cpus} --write-index -o \$CONT_BAM -
 
@@ -60,9 +64,11 @@ process DECON_SR {
         -s \$SINGLETONS_OUT \\
         -0 /dev/null \$CLEAN_SORTED_BAM
 
+    # Removing dupes if existing
+    pigz -dc -p ${task.cpus} \$R1_OUT | seqkit rmdup --by-name -o \$R1_CLEAN
+    pigz -dc -p ${task.cpus} \$R2_OUT | seqkit rmdup --by-name -o \$R2_CLEAN
+
 	echo "[INFO]		Remove the temporary files"
-    rm \$CONT_BAM \$CONT_BAM.csi \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM
+    rm \$CONT_BAM \$CONT_BAM.csi \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM \$R1_OUT \$R2_OUT
     """
 }
-
-

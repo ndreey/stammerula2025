@@ -7,6 +7,7 @@ work/
 results/
 data/
 containers/
+misc/
 *.tar.gz
 *.gz
 
