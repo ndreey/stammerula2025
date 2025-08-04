@@ -12,9 +12,10 @@ process DECON_SR {
 
     input:
     tuple val(meta), path(read1), path(read2)
-	path(index_files)
-	path(comp_ref)
-    path(comp_headers)
+    path comp_ref_dir
+    val comp_ref
+    path comp_headers
+
 
     output:
     tuple val(meta),
@@ -25,6 +26,7 @@ process DECON_SR {
     script:
     """
 	echo "[INFO]		Defining inputs"
+    CONT_REF="${comp_ref_dir}/${comp_ref}"
     CONT_BAM="${meta.sample}_${meta.lane}.comp.sorted.bam"
     CONT_TXT="${meta.sample}_${meta.lane}-comp-reads.txt"
     CLEAN_RAW_BAM="${meta.sample}_${meta.lane}-clean.bam"
@@ -38,7 +40,7 @@ process DECON_SR {
 	echo "[INFO]		Align against competetive reference"
     bwa mem \\
         -R "@RG\\tID:${meta.sample}_${meta.lane}\\tSM:${meta.sample}_${meta.lane}\\tPL:ILLUMINA" \\
-        -t ${task.cpus} ${comp_ref} ${read1} ${read2} | \\
+        -t ${task.cpus} \$CONT_REF ${read1} ${read2} | \\
         samtools view -h -b -@ ${task.cpus} | \\
         samtools sort -@ ${task.cpus} --write-index -o \$CONT_BAM -
 
@@ -70,5 +72,3 @@ process DECON_SR {
     rm \$CONT_BAM \$CONT_BAM.csi \$CLEAN_RAW_BAM \$CLEAN_SORTED_BAM \$R1_OUT \$R2_OUT
     """
 }
-
-

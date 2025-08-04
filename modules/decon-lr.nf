@@ -12,9 +12,10 @@ process DECON_LR {
 
     input:
     tuple val(meta), path(read)
-	path(index_files)
-	path(comp_ref)
-    path(comp_headers)
+    path comp_ref_dir
+    val comp_ref
+    path comp_headers
+
 
     output:
     tuple val(meta), path("*-clean.fq.gz"), emit: decon_lr_reads
@@ -25,7 +26,7 @@ process DECON_LR {
     echo "[INFO]		Define input and outputs"
     ID=${meta.sample}_${meta.lane}
     READ=${read}
-    CONT_REF=${comp_ref}
+    CONT_REF=${comp_ref_dir}/${comp_ref}
     CONT_HEADERS=${comp_headers}
     CPU=${task.cpus}
 

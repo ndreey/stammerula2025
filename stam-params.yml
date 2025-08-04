@@ -19,28 +19,27 @@ res:
 
 # Init params
 metadata:
-  sr: "doc/metadata-sr.csv"
-  lr: "doc/metadata-lr.csv"
+  sr: "doc/test-sr.csv"
+  lr: "doc/test-lr.csv"
 
+# Reference genomes
 references:
   comp:
-    fasta: "../MAG-MAYHEM/data/comp_ref/competitive-ref.fasta"
+    dir: "data/comp_ref"
+    fasta: "competitive-ref.fasta"
     headers: "doc/hh-headers.txt"
-    index: "data/comp_ref/competitive-ref.fasta.gz.bwt"  # optional precomputed index
 
-# Process params
-fastqc_raw:
-  input: "data/sr-raw/*.fastq.gz"
-
-fastqc_ccs:
-  input: "data/hifi-ccs-raw/*.fastq.gz"
-
+# Trimming parameters
 trim:
-  input: "data/sr-raw/*_R{1,2}_001.fastq.gz"
   avg_qual: 20
   len_req: 36
 
-
+# Database paths
+db:
+  checkm2: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/CheckM2_database/uniref100.KO.1.dmnd"
+  bakta: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/databases/bakta-db_v6/db"
+  busco: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/"
+  GTDBtk: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/"
 
 
 
