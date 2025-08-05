@@ -16,6 +16,7 @@ res:
   metagenome: "results/05-metagenomes"
   binning: "results/06-metaWRAP-bins"
   binRef: "results/07-metaWRAP-refined-bins"
+  binQuality: "results/07-bin-quality-assessment"
 
 # Init params
 metadata:
@@ -34,12 +35,16 @@ trim:
   avg_qual: 20
   len_req: 36
 
+# BUSCO
+BUSCO:
+  lineage_db: "bacteria_odb10"
+
 # Database paths
 db:
   checkm2: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/CheckM2_database/uniref100.KO.1.dmnd"
-  bakta: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/databases/bakta-db_v6/db"
-  busco: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/"
-  GTDBtk: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/"
+  bakta: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/bakta-db_v6/db"
+  GTDBtk: "/sw/data/GTDB/R220/rackham/release220"
+  GTDBtk_mash: "/cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/databases/GTDB-MASH"
 
 
 
@@ -93,6 +98,41 @@ db:
 #   dependencies:
 #   - bioconda::megahit=1.2.9
 #   - bioconda::metamdbg=1.1
+#
+# metaWRAP: Wrapping program for metagenomic analysis (created 2025-05-26)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::metawrap=1.1.0
+#
+# BUSCO: Completeness and contamination (created 2025-07-10)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::busco=6.0.0
+#
+# GTDB-Tk: Taxonomic classifier (created 2025-05-14)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::gtdbtk=2.4.1
+#
+# bakta: Prokaryotic annotater (created 2025-08-04)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::bakta=1.11.3
+#
+# checkm2: Completeness and contamination (created 2025-03-14)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::checkm2=1.1.0
 #########################################################################
 
 images:
@@ -100,5 +140,8 @@ images:
   ALIGN: "oras://community.wave.seqera.io/library/bedtools_bwa_minimap2_picard_pruned:7307bc2358e45de6"
   STATS: "oras://community.wave.seqera.io/library/bbmap_biopet-validatefastq_seqkit:a1c4fb2615ae72e6"
   ASSEMBLY: "oras://community.wave.seqera.io/library/megahit_metamdbg:6fcef2bb1a0bd3a9"
-  #metaWRAP: "https://depot.galaxyproject.org/singularity/metawrap:1.0--0"
   metaWRAP: "./containers/metawrap_final.sif"
+  BUSCO: "oras://community.wave.seqera.io/library/busco:6.0.0--7def4b2c35a1aed1"
+  GTDBTk: "oras://community.wave.seqera.io/library/gtdbtk:2.4.0--6a9187dd79fb4cf0"
+  bakta: "oras://community.wave.seqera.io/library/bakta:1.11.3--73be9e79026f6814"
+  checkm2: "oras://community.wave.seqera.io/library/checkm2:1.1.0--450784eb7a60b7bf"
