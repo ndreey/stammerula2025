@@ -10,6 +10,7 @@ include { QC_REPORTS }                  from '../subworkflows/qcReports.nf'
 include { BINNING }                     from '../subworkflows/binning.nf'
 include { SHORT_ASSEMBLY }              from '../subworkflows/shortAssembly.nf'
 include { LONG_ASSEMBLY }               from '../subworkflows/longAssembly.nf'
+include { BIN_QUALITY }                 from '../subworkflows/binQuality.nf'
 
 workflow STAM_PIPELINE {
 
@@ -74,4 +75,9 @@ workflow STAM_PIPELINE {
             LONG_ASSEMBLY.out.long_metagenome,
             MERGE_BY_POP.out.pop_merged
         )
+
+        ////////////////////////////////////////////////////////////////////////////
+        // 7. Bin Quality Assessment
+        ////////////////////////////////////////////////////////////////////////////
+        BIN_QUALITY(BINNING.out.refined_bins)
 }

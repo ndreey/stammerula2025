@@ -5,6 +5,9 @@ process metaWRAPbinning {
     label "metaWRAP"
     tag "metaWRAP-binning-${id}"
 
+    publishDir "${params.res.binning}/${id}", 
+    mode: 'symlink', pattern: 'binning_results/*_bins'
+
     //container params.images.metaWRAP
 
     input:
