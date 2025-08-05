@@ -213,7 +213,7 @@ flowchart TD
 ```bash
    git clone https://github.com/ndreey/stammerula2025.git
    cd stammerula2025
-   ```
+```
 
 4. Prepare your metadata files (see [Input](#input) section)
 
