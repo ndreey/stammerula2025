@@ -1,179 +1,206 @@
+
 # stammerula2025
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A523.04.0-23aa62.svg)](https://www.nextflow.io/) [![run with conda](https://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
+ 
+## Introduction
+**stammerula2025** is a  metagenomics analysis workflow designed for processing both short-read (Illumina) and long-read (PacBio HiFi) sequencing data. This pipeline performs quality control, decontamination, assembly, and binning to extract high-quality metagenome-assembled genomes (MAGs) from metagenomic samples.
+
+## Pipeline Overview
+The pipeline consists of several key stages:
+
+1. **Quality Control & Trimming**  - Verifies and validates after each step.
+2. **Decontamination** - Competitive mapping
+3.  **Assembly** - Hybrid assembly using both short and long reads
+4. **Binning** - Metagenomic binning and bin refinement
+5. **MAG Assessment** - Annotation, taxonomic classification and MAG quality.
+
+## Pipeline Architecture
 
 ```mermaid
 flowchart TB
-
-    %% Parameters
-    subgraph " "
-        subgraph params
-            meta["metadata"]
-            refs["references"]
-        end
-        STAM([STAM_PIPELINE])
-        meta --> STAM
-        refs --> STAM
+    subgraph "Input Data"
+        SR[Short Reads<br/>Illumina]
+        LR[Long Reads<br/>PacBio HiFi]
+        REF[Competitive Reference<br/>Contamination DB]
     end
-
-    %% STAM_PIPELINE Workflow
-    subgraph STAM_PIPELINE
-        subgraph take
-            sr["short_reads"]
-            lr["long_reads"]
-            cref["comp_ref"]
-            chead["comp_headers"]
-        end
-        QC([QC_PREPROCESSING])
-        FM([FILE_MERGER])
-        sr --> QC
-        lr --> QC
-        cref --> QC
-        chead --> QC
-        QC --> FM
+    
+    subgraph "Quality Control & Preprocessing"
+        QC1[FastQC Raw]
+        TRIM[Fastp Trimming]
+        QC2[FastQC Trimmed]
+        DECON_SR[Decontamination SR]
+        DECON_LR[Decontamination LR]
     end
-
-    %% QC_PREPROCESSING Workflow
-    subgraph QC_PREPROCESSING
-        subgraph take
-            qsr["short_reads"]
-            qlr["long_reads"]
-            qref["comp_ref"]
-            qhead["comp_headers"]
-        end
-
-        VRAW([VALIDATE_PE_RAW])
-        MRAW([MERGE_VALI_RES_RAW])
-        SRAW([FASTQ_STATS_SR_RAW])
-        SLRAW([FASTQ_STATS_LR_RAW])
-        FQR([FASTQC_RAW])
-        MQR([MULTIQC_RAW])
-        FQCCS([FASTQC_CCS])
-        MQCCS([MULTIQC_CCS])
-        TR([TRIM])
-        FQT([FASTQC_TRIM])
-        MQT([MULTIQC_TRIM])
-        MQFP([MULTIQC_FASTP])
-        VTRIM([VALIDATE_PE_TRIM])
-        MTRIM([MERGE_VALI_RES_TRIM])
-        STRIM([FASTQ_STATS_SR_TRIM])
-        IDX([BWA_INDEX_COMP_REF])
-        MMI([INDEX_MINIMAP2])
-        DSR([DECON_SR])
-        DLR([DECON_LR])
-        VDECON([VALIDATE_PE_DECON])
-        MDECON([MERGE_VALI_RES_DECON])
-        SDECON([FASTQ_STATS_SR_DECON])
-        SLDECON([FASTQ_STATS_LR_DECON])
-
-        subgraph emit
-            dsr_out["decon_sr_reads"]
-            dlr_out["decon_lr_reads"]
-        end
-
-        qsr --> VRAW --> MRAW
-        qsr --> SRAW
-        qlr --> SLRAW
-        qsr --> FQR --> MQR
-        qlr --> FQCCS --> MQCCS
-        qsr --> TR
-        TR --> FQT --> MQT
-        TR --> MQFP
-        TR --> VTRIM --> MTRIM
-        TR --> STRIM
-
-        qref --> IDX --> DSR
-        qref --> MMI --> DLR
-        qref --> DLR
-        qhead --> DSR
-        qhead --> DLR
-        TR --> DSR
-        qlr --> DLR
-
-        DSR --> VDECON --> MDECON
-        DSR --> SDECON
-        DLR --> SLDECON
-
-        DSR --> dsr_out
-        DLR --> dlr_out
+    
+    subgraph "Read Merging"
+        MERGE_SAMPLE[Merge by Sample]
+        MERGE_POP[Merge by Population]
     end
-
-    %% FILE_MERGER Workflow
-    subgraph FILE_MERGER
-        subgraph take
-            dsr_in["decon_sr_reads"]
-        end
-        MS([mergeBySample])
-        subgraph emit
-            mreads["merged_reads"]
-        end
-        dsr_in --> MS --> mreads
+    
+    subgraph "Assembly"
+        ASM_SHORT[MEGAHIT<br/>Short Read Assembly]
+        ASM_LONG[metaMDBG<br/>Long Read Assembly]
     end
+    
+    subgraph "Binning & Refinement"
+        BIN[metaWRAP Binning<br/>CONCOCT + MaxBin2 + MetaBAT2]
+        REFINE[Bin Refinement<br/>metaWRAP]
+    end
+    
+    SR --> QC1
+    LR --> QC1
+    SR --> TRIM --> QC2
+    TRIM --> DECON_SR
+    LR --> DECON_LR
+    DECON_SR --> MERGE_SAMPLE
+    DECON_SR --> MERGE_POP
+    MERGE_POP --> ASM_SHORT
+    DECON_LR --> ASM_LONG
+    ASM_LONG --> BIN
+    MERGE_POP --> BIN
+    BIN --> REFINE
+```
 
-    %% Connect QC emit to FILE_MERGER take
-    dsr_out --> dsr_in
+  
 
+## Quick Start
+
+1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=23.04.0`)
+2. Install apptainer
+3. Clone the repository:
+
+```bash
+   git clone https://github.com/ndreey/stammerula2025.git
+   cd stammerula2025
+   ```
+
+4. Prepare your metadata files (see [Input](#input) section)
+
+5. Run the pipeline:
+
+```bash
+   nextflow run main.nf -params-file stam-params.yml -profile slurm
+```
+
+  
+## Input Requirements
+
+### 1. Short-Read Metadata (`metadata.sr`)
+CSV file with columns:
+- `POP`: Population identifier
+- `HP`: Host plant
+- `REG`: Region
+- `regHP`: Region-host combination
+- `SAMPLE`: Sample identifier
+- `LANE`: Sequencing lane
+- `READ1`: Path to R1 FASTQ file
+- `READ2`: Path to R2 FASTQ file
+
+### 2. Long-Read Metadata (`metadata.lr`)
+CSV file with columns:
+- `POP`: Population identifier
+- `SAMPLE`: Sample identifier
+- `CELL`: SMRT cell identifier
+- `READ`: Path to HiFi FASTQ file
+
+### 3. Competitive Reference
+- `comp_ref_dir`: Directory containing reference genome
+- `comp_ref_fasta`: Reference FASTA file
+- `comp_headers`: File with reference sequence headers
+
+
+## Parameters
+Key parameters can be configured in `stam-params.yml`:
+
+### Input/Output
+- `metadata.sr`: Path to short-read metadata CSV
+- `metadata.lr`: Path to long-read metadata CSV
+- `references.comp.dir`: Competitive reference directory
+- `references.comp.fasta`: Comp. reference FASTA file
+- `references.comp.headers`: Comp. reference headers file
+  
+### Quality Control
+- `trim.avg_qual`: Average quality threshold (default: 20)
+- `trim.len_req`: Minimum length required (default: 50)
+
+## Output
+
+The pipeline generates several output directories:
+
+```
+results/
+├── 00-QC/                          # Quality control reports
+│   ├── fastqc-raw/                 # Raw read FastQC
+│   ├── fastqc-trim/                # Trimmed read FastQC
+│   ├── multiqc-raw/                # Raw read MultiQC
+│   └── multiqc-trim/               # Trimmed read MultiQC
+├── 01-trimmed/                     # Trimmed reads
+├── 02-decontamination/             # Decontaminated reads
+│   ├── clean-reads/                # Short reads
+│   └── clean-reads-lr/             # Long reads
+├── 03-sample-merged-sr/            # Sample-merged short reads
+├── 04-pop-merged-sr/               # Population-merged short reads
+├── 05-metagenomes/                 # Assembled metagenomes
+│   ├── 01-metamdbg/                # Long-read assemblies
+│   └── 02-megahit/                 # Short-read assemblies
+├── 06-metaWRAP-refined-bins/       # Initial and refined bins
+└── 07-bin-quality-assessment/      # Output to evaluate MAG quality.
 ```
 
 
-```mermaid
-flowchart TB
-    subgraph QC_PREPROCESSING
-    subgraph take
-    v0["short_reads"]
-    v1["long_reads"]
-    v2["comp_ref"]
-    v3["comp_headers"]
-    end
-    v5([VALIDATE_PE_RAW])
-    v7([MERGE_VALI_RES_RAW])
-    v10([FASTQ_STATS_SR_RAW])
-    v11([FASTQ_STATS_LR_RAW])
-    v13([FASTQC_RAW])
-    v15([MULTIQC_RAW])
-    v17([FASTQC_CCS])
-    v19([MULTIQC_CCS])
-    v20([TRIM])
-    v22([FASTQC_TRIM])
-    v24([MULTIQC_TRIM])
-    v26([MULTIQC_FASTP])
-    v28([VALIDATE_PE_TRIM])
-    v30([MERGE_VALI_RES_TRIM])
-    v32([FASTQ_STATS_SR_TRIM])
-    v33([BWA_INDEX_COMP_REF])
-    v35([INDEX_MINIMAP2])
-    v37([DECON_SR])
-    v38([DECON_LR])
-    v40([VALIDATE_PE_DECON])
-    v42([MERGE_VALI_RES_DECON])
-    v45([FASTQ_STATS_SR_DECON])
-    v46([FASTQ_STATS_LR_DECON])
-    v0 --> v5
-    v5 --> v7
-    v0 --> v10
-    v1 --> v11
-    v0 --> v13
-    v13 --> v15
-    v1 --> v17
-    v17 --> v19
-    v0 --> v20
-    v20 --> v22
-    v22 --> v24
-    v20 --> v26
-    v20 --> v28
-    v28 --> v30
-    v20 --> v32
-    v2 --> v33
-    v2 --> v35
-    v33 --> v37
-    v2 --> v37
-    v3 --> v37
-    v20 --> v37
-    v1 --> v38
-    v2 --> v38
-    v3 --> v38
-    v35 --> v38
-    v37 --> v40
-    v40 --> v42
-    v37 --> v45
-    v38 --> v46
-    end
-```
+  
+
+## Resource Requirements
+
+ ## Container Support
+
+The pipeline uses Wave containers for reproducibility. Containers are automatically pulled when using Apptainer or other supported container engines.
+
+
+  
+
+## Citation
+If you use stammerula2025 for your analysis, please cite:
+
+> **stammerula2025: fancy title**
+> *Author et al.* (2025)
+
+And following programs that made this pipeline possible:
+
+| Tool               | Version | Link |
+| ------------------ | ------- | ---- |
+| fastp              | 0.23.4  |      |
+| Kraken2            | 2.1.2   |      |
+| BWA-MEM            | 0.7.17  |      |
+| BEDTools           | 2.31.1  |      |
+| Minimap2           | 2.26    |      |
+| SPAdes             | 3.15.5  |      |
+| metaSPAdes         | 3.15.5  |      |
+| hybridSPAdes       | 3.15.5  |      |
+| Anvio              | 8.0     |      |
+| Bowtie2            | tba     |      |
+| Prodigal           | 2.6.3   |      |
+| metaWRAP           | 1.3.2   |      |
+| CONCOCT            | 1.0.0   |      |
+| MaxBin2            | 2.2.7   |      |
+| MetaBAT2           | 2.15    |      |
+| CheckM             | 1.0.18  |      |
+| CheckM2            | 1.0.1   |      |
+| BUSCO              | 5.5.0   |      |
+| GTDB-Tk            | 2.4.0   |      |
+| Bakta              | 1.9.3   |      |
+| BLAST+             | 2.15.0  |      |
+| R script dotPlotly | N/A     |      |
+
+## Support
+For questions and support:
+- Open an issue on [GitHub](https://github.com/ndreey/stammerula2025/issues)
+- Check the [documentation](https://github.com/ndreey/stammerula2025)
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+
+*Pipeline developed by André Bourbonnais (ndreey) for Master Thesis research*
