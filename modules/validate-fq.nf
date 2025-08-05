@@ -2,7 +2,7 @@
 
 process VALIDATE_PE {
 
-    label 'stats'
+    label 'validate'
     tag "validate-${read1.getSimpleName().replaceAll(/_R[12][-_]?.*$/, '')}-${type}"
 
     container params.images.STATS

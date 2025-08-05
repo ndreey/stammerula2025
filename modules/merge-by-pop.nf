@@ -2,7 +2,7 @@
 
 process mergeByPop {
 
-    label 'stats'
+    label 'mergeByPop'
     tag "mergeByPop-${pop_id}"
 
     publishDir "${params.res.mergedPop}", mode: 'symlink', 

@@ -28,8 +28,6 @@ workflow {
     def comp_ref_ch         = init_outputs.comp_ref
     def comp_headers_ch     = init_outputs.comp_headers
 
-    log.info "COMPLETED: Input data initialization and validation"
-
     // Launch main analysis logic
     STAM_PIPELINE(
         short_reads_ch,

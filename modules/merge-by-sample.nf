@@ -2,7 +2,7 @@
 
 process mergeBySample {
 
-    label 'stats'
+    label 'mergeBySample'
     tag "mergeBySample-${sample_id}"
 
     publishDir "${params.res.mergedSample}", mode: 'symlink', 

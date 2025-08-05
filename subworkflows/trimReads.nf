@@ -15,7 +15,6 @@ workflow TRIM_READS {
         short_reads  // tuple(meta, read1, read2)
 
     main:
-        log.info "STARTING: Read trimming and quality filtering with fastp"
         TRIM_PROCESS(short_reads)
 
     emit:
