@@ -10,7 +10,6 @@ workflow BINNING {
         merged_pops        // [pop_id, r1, r2]
     
     main:
-        log.info "STARTING: Metagenomic binning workflow"
         
         // Extract population from the single long metagenome
         target_pop = long_metagenome.map { pop, sample, file -> pop }
@@ -28,10 +27,8 @@ workflow BINNING {
                 tuple("${pop}-${sample}", metagenome, r1, r2)
             }
 
-        log.info "RUNNING: Initial binning with CONCOCT, MaxBin2, and MetaBAT2"
         metaWRAPbinning(bin_input)
 
-        log.info "RUNNING: Bin refinement and consolidation"
         // metaWRAPbinning output is exactly what binRefinement needs!
         binRefinement(metaWRAPbinning.out.bin_dirs)
 

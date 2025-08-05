@@ -1,6 +1,6 @@
 process FASTQ_STATS {
 
-    label 'stats'
+    label 'seqkit'
     tag "${id}-seqkit-stats"
 
     publishDir 'results/stats', mode: 'copy'

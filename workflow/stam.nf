@@ -83,39 +83,39 @@ workflow STAM_PIPELINE {
 
         
         // Workflow completion messages
-        TRIM_READS.out.trimmed_reads.subscribe { 
+        TRIM_READS.out.trimmed_reads.last().subscribe { 
             log.info "COMPLETED: Read trimming and quality filtering"
         }
 
-        DECON_SR.out.decon_sr_reads.subscribe { 
+        DECON_SR.out.decon_sr_reads.last().subscribe { 
             log.info "COMPLETED: Short-read decontamination"
         }
 
-        DECON_LR.out.decon_lr_reads.subscribe { 
+        DECON_LR.out.decon_lr_reads.last().subscribe { 
             log.info "COMPLETED: Long-read decontamination"
         }
 
-        MERGE_BY_SAMPLE.out.sample_merged.subscribe { 
+        MERGE_BY_SAMPLE.out.sample_merged.last().subscribe { 
             log.info "COMPLETED: Sample-level read merging"
         }
 
-        MERGE_BY_POP.out.pop_merged.subscribe { 
+        MERGE_BY_POP.out.pop_merged.last().subscribe { 
             log.info "COMPLETED: Population-level read merging"
         }
 
-        SHORT_ASSEMBLY.out.short_metagenomes.subscribe { 
+        SHORT_ASSEMBLY.out.short_metagenomes.last().subscribe { 
             log.info "COMPLETED: Short-read metagenome assembly (MEGAHIT)"
         }
 
-        LONG_ASSEMBLY.out.long_metagenome.subscribe { 
+        LONG_ASSEMBLY.out.long_metagenome.last().subscribe { 
             log.info "COMPLETED: Long-read metagenome assembly (metaMDBG)"
         }
 
-        BINNING.out.refined_bins.subscribe { 
+        BINNING.out.refined_bins.last().subscribe { 
             log.info "COMPLETED: Metagenomic binning and refinement"
         }
 
-        BIN_QUALITY.out.gtdbtk_results.subscribe { 
+        BIN_QUALITY.out.gtdbtk_results.last().subscribe { 
             log.info "COMPLETED: Bin quality assessment and annotation"
         }
 }

@@ -77,10 +77,6 @@ workflow FASTQ_VALIDATION_STATS {
 
     FASTQ_STATS_SAMPLE_MERGE(short_reads_sample_merged.flatMap { sample_id, pop, r1, r2 -> [r1, r2] }.collect().map { f -> tuple(f, "sample-merged") })
 
-    //VALIDATE_PE_SAMPLE_MERGE(short_reads_sample_merged.map { m, r1, r2 -> tuple(r1, r2, "sample-merged") })
-    //MERGE_VALI_RES_SAMPLE_MERGE(VALIDATE_PE_SAMPLE_MERGE.out.validate.collect().map { f -> tuple(f, "sample-merged") })
-
-    //FASTQ_STATS_SAMPLE_MERGE(short_reads_sample_merged.flatMap { m, r1, r2 -> [r1, r2] }.collect().map { f -> tuple(f, "sample-merged") })
 
     ////////////////////////////////////////////////////////////////////////////////
     // Merged by population
