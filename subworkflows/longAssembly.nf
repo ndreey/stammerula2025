@@ -8,6 +8,8 @@ workflow LONG_ASSEMBLY {
         long_reads    // [meta, read]
 
     main:
+        log.info "STARTING: Long-read metagenome assembly with metaMDBG"
+        
         // Extract all reads and group them for the assembler
         collected_reads = long_reads.map { meta, read -> read }.collect()
 

@@ -18,7 +18,7 @@ workflow DECON_LR {
         comp_headers
 
     main:
-
+        log.info "STARTING: Long-read decontamination using competitive reference"
         DECON_LR_PROCESS(
             long_reads,
             comp_ref_dir,

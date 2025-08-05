@@ -15,6 +15,7 @@ workflow MERGE_BY_POP {
         decon_sr_reads  // tuple(meta, r1, r2)
 
     main:
+        log.info "STARTING: Merging decontaminated reads by population"
         grouped_reads = decon_sr_reads
             .map { meta, r1, r2 -> tuple(meta.pop, meta, r1, r2) }
             .groupTuple(by: 0)
