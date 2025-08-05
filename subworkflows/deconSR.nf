@@ -18,7 +18,7 @@ workflow DECON_SR {
         comp_headers
 
     main:
-
+        log.info "STARTING: Short-read decontamination using competitive reference"
         DECON_SR_PROCESS(
             trimmed_reads,
             comp_ref_dir,

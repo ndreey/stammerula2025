@@ -8,6 +8,7 @@ workflow SHORT_ASSEMBLY {
         pop_reads  // [pop_id, r1, r2]
 
     main:
+        log.info "STARTING: Short-read metagenome assembly with MEGAHIT"
         SHORT_ASSEMBLY_PROC(pop_reads)
 
     emit:

@@ -15,6 +15,9 @@ params.timestamp = new Date().format('yyyyMMdd-HH-mm-ss')
 
 workflow {
 
+    log.info "STARTING: Stammerula 2025 Metagenomics Pipeline"
+    log.info "Timestamp: ${params.timestamp}"
+
     // Run init subworkflow to prepare input data
     def init_outputs = INIT()
 
@@ -25,6 +28,8 @@ workflow {
     def comp_ref_ch         = init_outputs.comp_ref
     def comp_headers_ch     = init_outputs.comp_headers
 
+    log.info "COMPLETED: Input data initialization and validation"
+
     // Launch main analysis logic
     STAM_PIPELINE(
         short_reads_ch,
@@ -33,4 +38,27 @@ workflow {
         comp_ref_ch,
         comp_headers_ch
     )
+}
+
+// Workflow completion handlers
+workflow.onComplete {
+    log.info "Pipeline execution completed at: ${new Date()}"
+    log.info "Execution status: ${workflow.success ? 'SUCCESS' : 'FAILED'}"
+    log.info "Execution duration: ${workflow.duration}"
+    log.info "CPU hours: ${workflow.stats.computeTimeFmt ?: 'N/A'}"
+    log.info "Peak memory usage: ${workflow.stats.peakMemory ?: 'N/A'}"
+    
+    if (workflow.success) {
+        log.info "Results are available in the following directories:"
+        log.info "  - Quality Control: results/00-QC/"
+        log.info "  - Assemblies: results/05-metagenomes/"
+        log.info "  - Refined Bins: results/06-metaWRAP-refined-bins/"
+        log.info "  - Quality Assessment: results/07-bin-quality-assessment/"
+        log.info "  - Statistics: results/stats/"
+    }
+}
+
+workflow.onError {
+    log.error "Pipeline execution stopped with the following message: ${workflow.errorMessage}"
+    log.error "Failed process: ${workflow.errorReport}"
 }
