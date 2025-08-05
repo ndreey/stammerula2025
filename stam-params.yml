@@ -14,14 +14,13 @@ res:
   mergedSample: "results/03-sample-merged-sr"
   mergedPop: "results/04-pop-merged-sr"
   metagenome: "results/05-metagenomes"
-  binning: "results/06-metaWRAP-bins"
-  binRef: "results/07-metaWRAP-refined-bins"
+  binRef: "results/06-metaWRAP-refined-bins"
   binQuality: "results/07-bin-quality-assessment"
 
 # Init params
 metadata:
-  sr: "doc/test-sr.csv"
-  lr: "doc/test-lr.csv"
+  sr: "doc/metadata-sr.csv"
+  lr: "doc/metadata-lr.csv"
 
 # Reference genomes
 references:
