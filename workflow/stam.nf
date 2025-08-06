@@ -82,40 +82,4 @@ workflow STAM_PIPELINE {
         BIN_QUALITY(BINNING.out.refined_bins)
 
         
-        // Workflow completion messages - only log when ALL files have completed each step
-        //TRIM_READS.out.trimmed_reads.last().subscribe { it ->
-        //    log.info "COMPLETED: Read trimming and quality filtering"
-        //}
-        //
-        //DECON_SR.out.decon_sr_reads.last().subscribe { it ->
-        //    log.info "COMPLETED: Short-read decontamination"
-        //}
-        //
-        //DECON_LR.out.decon_lr_reads.last().subscribe { it ->
-        //    log.info "COMPLETED: Long-read decontamination"
-        //}
-        //
-        //MERGE_BY_SAMPLE.out.sample_merged.last().subscribe { it ->
-        //    log.info "COMPLETED: Sample-level read merging"
-        //}
-        //
-        //MERGE_BY_POP.out.pop_merged.last().subscribe { it ->
-        //    log.info "COMPLETED: Population-level read merging"
-        //}
-        //
-        //SHORT_ASSEMBLY.out.short_metagenomes.last().subscribe { it ->
-        //    log.info "COMPLETED: Short-read metagenome assembly (MEGAHIT)"
-        //}
-        //
-        //LONG_ASSEMBLY.out.long_metagenome.last().subscribe { it ->
-        //    log.info "COMPLETED: Long-read metagenome assembly (metaMDBG)"
-        //}
-        //
-        //BINNING.out.refined_bins.last().subscribe { it ->
-        //    log.info "COMPLETED: Metagenomic binning and refinement"
-        //}
-        //
-        //BIN_QUALITY.out.gtdbtk_results.last().subscribe { it ->
-        //    log.info "COMPLETED: Bin quality assessment and annotation"
-        //}
 }
