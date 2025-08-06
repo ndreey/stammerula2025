@@ -9,23 +9,20 @@ workflow LONG_ASSEMBLY {
 
     main:
         
-        // Extract all reads and group them for the assembler
-        collected_reads = long_reads.map { meta, read -> read }.collect()
-
-        // Extract a representative sample/pop (since they're all the same)
-        meta_info = long_reads.map { meta, read -> tuple(meta.pop, meta.sample) }.first()
-
-        // Use cross instead of combine to avoid flattening
-        assembly_input = meta_info.cross(collected_reads).map { meta_tuple, reads_list ->
-            def pop = meta_tuple[0]
-            def sample = meta_tuple[1]
-            tuple(pop, sample, reads_list)
+        // Debug: Print what we're receiving
+        long_reads.view { meta, read -> 
+            "[INFO] Long read input: pop=${meta.pop}, sample=${meta.sample}, cell=${meta.cell}, read=${read}" 
         }
-          
-        
-        //assembly_input = meta_info.combine(collected_reads).map { pop, sample, reads ->
-        //    tuple(pop, sample, reads)
-        //}
+
+        // Prepare the assembly input for each pop-sample grouping.
+        assembly_input = long_reads
+            .map { meta, read -> 
+                tuple(meta.pop, meta.sample, read)  // Group by pop AND sample
+            }
+            .groupTuple(by: [0, 1])  // Group by both population (index 0) and sample (index 1)
+            .view { pop, sample, reads -> 
+                "[INFO] Assembly starting: pop=${pop}, sample=${sample}, reads=${reads.size()} files" 
+            }
 
         LONG_ASSEMBLY_PROC(assembly_input)
 
