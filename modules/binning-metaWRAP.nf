@@ -44,8 +44,9 @@ process metaWRAPbinning {
     zcat ${read1} > \$R1_TEMP
     zcat ${read2} > \$R2_TEMP
 
-    echo "Decompressing metagenome to metaWRAP friendly format:"
-    zcat ${metagenome} > \$METAGENOME
+    echo "[INFO] Handling metagenome file..."
+    # Try to decompress, if it fails, just use the file as-is
+    (zcat ${metagenome} > \$METAGENOME 2>/dev/null) || METAGENOME=${metagenome}
 
     echo "[INFO] Running metaWRAP binning..."
     metawrap binning \\
