@@ -15,193 +15,126 @@ The pipeline consists of several key stages:
 5. **MAG Assessment** - Annotation, taxonomic classification and MAG quality.
 
 ## Pipeline Architecture
-_flowchart is in progress_
-```mermaid
-flowchart TD
-    %% Input Data Sources
-    subgraph "📁 Input Data"
-        SR_META[Short-Read Metadata<br/>CSV File]
-        LR_META[Long-Read Metadata<br/>CSV File]
-        COMP_REF[Competitive Reference<br/>Database]
-        SR_RAW[Short Reads<br/>Illumina FASTQ]
-        LR_RAW[Long Reads<br/>PacBio HiFi FASTQ]
-    end
+_pipeline v1.0 complete, flowchart, not so complete._
+So here is tree structure of the results folder.
 
-    %% Data Initialization
-    subgraph "🔧 Data Initialization"
-        INIT[INIT Subworkflow<br/>Parse metadata & load files]
-    end
+FLOWCHART IS IN PROGRESS
 
-    %% Phase 1: Quality Control & Preprocessing
-    subgraph "🧹 Phase 1: Quality Control & Preprocessing"
-        TRIM[TRIM_READS<br/>fastp trimming]
-        DECON_SR[DECON_SR<br/>Short-read decontamination<br/>BWA alignment]
-        DECON_LR[DECON_LR<br/>Long-read decontamination<br/>minimap2 alignment]
-        
-        subgraph "📊 Raw QC Reports"
-            FASTQC_RAW[FastQC Raw Reads]
-            MULTIQC_RAW[MultiQC Raw Report]
-            FASTQC_CCS[FastQC HiFi Reads]
-            MULTIQC_CCS[MultiQC HiFi Report]
-        end
-        
-        subgraph "📊 Post-Trim QC"
-            FASTQC_TRIM[FastQC Trimmed]
-            MULTIQC_TRIM[MultiQC Trimmed]
-            MULTIQC_FASTP[MultiQC fastp Report]
-        end
-    end
+```bash
+tree -L 3 -d results/
+results/
+├── 00-QC
+│   ├── fastqc-ccs-raw
+│   ├── fastqc-raw
+│   ├── fastqc-trim
+│   ├── multiqc-ccs-raw
+│   │   └── multiqc_data -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/53/f5ec2b8cd48ca9ee3b62e18dc31ffa/multiqc_data
+│   ├── multiqc-fastp
+│   │   └── multiqc_data -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/59/a9baf910465dc80802ae25efc6b7e9/multiqc_data
+│   ├── multiqc-raw
+│   │   └── multiqc_data -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/84/989ba4135a6577f9f845efa9e80fb1/multiqc_data
+│   └── multiqc-trim
+│       └── multiqc_data -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/0e/febe5a05967fdaf68e383ac98bebfd/multiqc_data
+├── 01-trimmed
+├── 02-decontamination
+│   ├── clean-reads
+│   └── clean-reads-lr
+├── 03-sample-merged-sr
+├── 04-pop-merged-sr
+├── 05-metagenomes
+│   ├── 01-metamdbg
+│   └── 02-megahit
+│       ├── CHES
+│       ├── CHFI
+│       ├── CHSC
+│       ├── CHSK
+│       ├── CHST
+│       ├── COES
+│       ├── COGE
+│       ├── COLI
+│       ├── COSK
+│       └── CPSC
+├── 06-metaWRAP-refined-bins
+│   ├── CHES
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/cb/9412254cb51411ae9e369b4f072835/bin_refinement
+│   ├── CHFI
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/1a/09238cb6e507af42be811db9a51b83/bin_refinement
+│   ├── CHSC
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/f3/5359b69cf9b6b4df689d2d3216d730/bin_refinement
+│   ├── CHSK
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/1d/f535986895dc6aa6c1e3f6c48a9470/bin_refinement
+│   ├── CHST
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/9f/1855641477215bbeeb36702a1b9463/bin_refinement
+│   ├── CHST-pt_042
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/42/da6c56bbba54f5618a66a0027b3a96/bin_refinement
+│   ├── COES
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/aa/2dab68851ceea47137486bedd4d13c/bin_refinement
+│   ├── COGE
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/00/1ef78a22c2d512af44ea65701c113b/bin_refinement
+│   ├── COLI
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/e1/a5915aa9d71ef8df4e8b0dcb7d7343/bin_refinement
+│   ├── COSK
+│   │   └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/69/258706cebf8279196872a0742f7ddc/bin_refinement
+│   └── CPSC
+│       └── bin_refinement -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/f1/3da742cf7e64d6ce71814d87bd9268/bin_refinement
+├── 07-bin-quality-assessment
+│   ├── CHES
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/f1/3fee789b1a861cb30b7b579678b715/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── CHFI
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/d9/1ef91681e906749505629dd3aea19f/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── CHSC
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/41/f42059ccd7517afa71613827e34402/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── CHSK
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/ee/4c37c5d552467fa6e965bc21171e72/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── CHST
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/93/67e403a61f7127d1096e128a7bdb53/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── CHST-pt_042
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/1a/833229ba0635658f879ded3faafa50/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── COES
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/e0/b51556ebe4ae7c5800b707db984e73/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── COGE
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/80/9f58aff5a7a430f879273d3bd84f73/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── COLI
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/72/391118d945d67d8f309749633b63b9/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   ├── COSK
+│   │   ├── bakta
+│   │   ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/24/948cea903c1747263eab2306789d17/busco_output
+│   │   ├── checkm2
+│   │   └── GTDB-Tk
+│   └── CPSC
+│       ├── bakta
+│       ├── busco_output -> /cfs/klemming/projects/supr/snic2020-6-222/Projects/Tconura/working/Andre/stammerula2025/work/9e/2e4a5687f9294f333b15ce2ffc55bf/busco_output
+│       ├── checkm2
+│       └── GTDB-Tk
+└── stats
 
-    %% Phase 2: Read Organization
-    subgraph "📦 Phase 2: Read Organization"
-        MERGE_SAMPLE[MERGE_BY_SAMPLE<br/>Combine reads by sample]
-        MERGE_POP[MERGE_BY_POP<br/>Combine reads by population]
-        
-        subgraph "📊 Merged QC"
-            FASTQC_SAMPLE[FastQC Sample Merged]
-            MULTIQC_SAMPLE[MultiQC Sample Report]
-            FASTQC_POP[FastQC Population Merged]
-            MULTIQC_POP[MultiQC Population Report]
-        end
-    end
-
-    %% Phase 3: Validation & Statistics
-    subgraph "✅ Phase 3: Validation & Statistics"
-        subgraph "🔍 FASTQ Validation"
-            VALIDATE_RAW[Validate Raw Reads]
-            VALIDATE_TRIM[Validate Trimmed Reads]
-            VALIDATE_DECON[Validate Decontaminated]
-            VALIDATE_SAMPLE[Validate Sample Merged]
-            VALIDATE_POP[Validate Population Merged]
-        end
-        
-        subgraph "📈 Statistics Generation"
-            STATS_SR_RAW[Short-Read Raw Stats]
-            STATS_LR_RAW[Long-Read Raw Stats]
-            STATS_SR_TRIM[Short-Read Trim Stats]
-            STATS_SR_DECON[Short-Read Decon Stats]
-            STATS_LR_DECON[Long-Read Decon Stats]
-            STATS_SAMPLE[Sample Merge Stats]
-            STATS_POP[Population Merge Stats]
-        end
-    end
-
-    %% Phase 4: Assembly
-    subgraph "🧬 Phase 4: Assembly"
-        SHORT_ASM[SHORT_ASSEMBLY<br/>MEGAHIT<br/>Population-level assembly]
-        LONG_ASM[LONG_ASSEMBLY<br/>metaMDBG<br/>HiFi assembly]
-    end
-
-    %% Phase 5: Binning
-    subgraph "📦 Phase 5: Binning & Refinement"
-        BINNING_PROC[metaWRAP Binning<br/>CONCOCT + MaxBin2 + MetaBAT2]
-        BIN_REFINE[Bin Refinement<br/>metaWRAP refinement]
-    end
-
-    %% Phase 6: Quality Assessment
-    subgraph "🔬 Phase 6: MAG Quality Assessment"
-        GTDBTK[GTDB-Tk<br/>Taxonomic Classification<br/>🗄️ GTDB Database]
-        CHECKM2[CheckM2<br/>Completeness & Contamination<br/>🗄️ CheckM2 Database]
-        BUSCO[BUSCO<br/>Gene Completeness<br/>🗄️ BUSCO Database]
-        BAKTA[Bakta<br/>Genome Annotation<br/>🗄️ Bakta Database]
-    end
-
-    %% Output Results
-    subgraph "📤 Final Outputs"
-        RESULTS_QC[Quality Control Reports]
-        RESULTS_ASM[Assembled Metagenomes]
-        RESULTS_BINS[Refined MAG Bins]
-        RESULTS_TAX[Taxonomic Classifications]
-        RESULTS_QUAL[Quality Assessments]
-        RESULTS_ANNOT[Genome Annotations]
-    end
-
-    %% Flow Connections
-    SR_META --> INIT
-    LR_META --> INIT
-    COMP_REF --> INIT
-    
-    INIT --> SR_RAW
-    INIT --> LR_RAW
-    INIT --> COMP_REF
-    
-    %% Phase 1 Flow
-    SR_RAW --> TRIM
-    SR_RAW --> FASTQC_RAW --> MULTIQC_RAW
-    LR_RAW --> FASTQC_CCS --> MULTIQC_CCS
-    LR_RAW --> DECON_LR
-    
-    TRIM --> DECON_SR
-    TRIM --> FASTQC_TRIM --> MULTIQC_TRIM
-    TRIM --> MULTIQC_FASTP
-    
-    COMP_REF --> DECON_SR
-    COMP_REF --> DECON_LR
-    
-    %% Phase 2 Flow
-    DECON_SR --> MERGE_SAMPLE
-    DECON_SR --> MERGE_POP
-    
-    MERGE_SAMPLE --> FASTQC_SAMPLE --> MULTIQC_SAMPLE
-    MERGE_POP --> FASTQC_POP --> MULTIQC_POP
-    
-    %% Phase 3 Flow
-    SR_RAW --> VALIDATE_RAW --> STATS_SR_RAW
-    LR_RAW --> STATS_LR_RAW
-    TRIM --> VALIDATE_TRIM --> STATS_SR_TRIM
-    DECON_SR --> VALIDATE_DECON --> STATS_SR_DECON
-    DECON_LR --> STATS_LR_DECON
-    MERGE_SAMPLE --> VALIDATE_SAMPLE --> STATS_SAMPLE
-    MERGE_POP --> VALIDATE_POP --> STATS_POP
-    
-    %% Phase 4 Flow
-    MERGE_POP --> SHORT_ASM
-    DECON_LR --> LONG_ASM
-    
-    %% Phase 5 Flow
-    LONG_ASM --> BINNING_PROC
-    MERGE_POP --> BINNING_PROC
-    BINNING_PROC --> BIN_REFINE
-    
-    %% Phase 6 Flow
-    BIN_REFINE --> GTDBTK
-    BIN_REFINE --> CHECKM2
-    BIN_REFINE --> BUSCO
-    BIN_REFINE --> BAKTA
-    
-    %% Output Flow
-    MULTIQC_RAW --> RESULTS_QC
-    MULTIQC_CCS --> RESULTS_QC
-    MULTIQC_TRIM --> RESULTS_QC
-    MULTIQC_FASTP --> RESULTS_QC
-    MULTIQC_SAMPLE --> RESULTS_QC
-    MULTIQC_POP --> RESULTS_QC
-    
-    SHORT_ASM --> RESULTS_ASM
-    LONG_ASM --> RESULTS_ASM
-    
-    BIN_REFINE --> RESULTS_BINS
-    
-    GTDBTK --> RESULTS_TAX
-    CHECKM2 --> RESULTS_QUAL
-    BUSCO --> RESULTS_QUAL
-    BAKTA --> RESULTS_ANNOT
-    
-    %% Styling
-    classDef inputData fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef qcProcess fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef assembly fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef binning fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef quality fill:#fce4ec,stroke:#880e4f,stroke-width:2px
-    classDef output fill:#f1f8e9,stroke:#33691e,stroke-width:2px
-    classDef database fill:#fff8e1,stroke:#f57f17,stroke-width:2px
-    
-    class SR_META,LR_META,COMP_REF,SR_RAW,LR_RAW inputData
-    class TRIM,DECON_SR,DECON_LR,FASTQC_RAW,MULTIQC_RAW,FASTQC_CCS,MULTIQC_CCS,FASTQC_TRIM,MULTIQC_TRIM,MULTIQC_FASTP,MERGE_SAMPLE,MERGE_POP,FASTQC_SAMPLE,MULTIQC_SAMPLE,FASTQC_POP,MULTIQC_POP qcProcess
-    class SHORT_ASM,LONG_ASM assembly
-    class BINNING_PROC,BIN_REFINE binning
-    class GTDBTK,CHECKM2,BUSCO,BAKTA quality
-    class RESULTS_QC,RESULTS_ASM,RESULTS_BINS,RESULTS_TAX,RESULTS_QUAL,RESULTS_ANNOT output
 ```
 
 ## Quick Start
