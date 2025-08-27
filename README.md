@@ -308,30 +308,93 @@ If you use stammerula2025 for your analysis, please cite:
 
 And following programs that made this pipeline possible:
 
-| Tool               | Version | Link |
-| ------------------ | ------- | ---- |
-| fastp              | 0.23.4  |      |
-| Kraken2            | 2.1.2   |      |
-| BWA-MEM            | 0.7.17  |      |
-| BEDTools           | 2.31.1  |      |
-| Minimap2           | 2.26    |      |
-| SPAdes             | 3.15.5  |      |
-| metaSPAdes         | 3.15.5  |      |
-| hybridSPAdes       | 3.15.5  |      |
-| Anvio              | 8.0     |      |
-| Bowtie2            | tba     |      |
-| Prodigal           | 2.6.3   |      |
-| metaWRAP           | 1.3.2   |      |
-| CONCOCT            | 1.0.0   |      |
-| MaxBin2            | 2.2.7   |      |
-| MetaBAT2           | 2.15    |      |
-| CheckM             | 1.0.18  |      |
-| CheckM2            | 1.0.1   |      |
-| BUSCO              | 5.5.0   |      |
-| GTDB-Tk            | 2.4.0   |      |
-| Bakta              | 1.9.3   |      |
-| BLAST+             | 2.15.0  |      |
-| R script dotPlotly | N/A     |      |
+```
+#########################################################################
+########################## Singularity Images ###########################
+#########################################################################
+# Images are created through seqera (https://seqera.io/)
+# QC: Initial read processing and quality control (created 2025-05-15)
+#   channels:
+#   - conda-forge
+#   - bioconda
+#   dependencies:
+#   - bioconda::bbmap=39.00
+#   - bioconda::bwa=0.7.19
+#   - bioconda::fastp=0.24.1
+#   - bioconda::fastqc=0.12.1
+#   - bioconda::minimap2=2.29
+#   - bioconda::multiqc=1.28
+#   - bioconda::picard=3.4.0
+#   - bioconda::samtools=1.20
+#   - bioconda::seqkit=2.10.0
+#   - conda-forge::pigz=2.8
+#
+# ALIGN: Aligners and parse tools (created 2025-05-22)
+#   channels:
+#   - conda-forge
+#   - bioconda
+#   dependencies:
+#   - bioconda::bedtools=2.31.1
+#   - bioconda::bwa=0.7.19
+#   - bioconda::minimap2=2.29
+#   - bioconda::picard=3.4.0
+#   - bioconda::samtools=1.20
+#   - bioconda::seqkit=2.10.0
+#   - conda-forge::pigz=2.8
+#
+# STATS: Sequence statistics programs (created 2025-05-22)
+#   channels:
+#   - conda-forge
+#   - bioconda
+#   dependencies:
+#   - bioconda::bbmap=39.00
+#   - bioconda::biopet-validatefastq=0.1.1
+#   - bioconda::seqkit=2.10.0
+#
+# ASSEMBLY: Metagenome assembler for both short and long reads (created 2025-05-26)
+#   channels:
+#   - conda-forge
+#   - bioconda
+#   dependencies:
+#   - bioconda::megahit=1.2.9
+#   - bioconda::metamdbg=1.1
+#
+# metaWRAP: Wrapping program for metagenomic analysis (created 2025-05-26)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::metawrap=1.1.0
+#
+# BUSCO: Completeness and contamination (created 2025-07-10)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::busco=6.0.0
+#
+# GTDB-Tk: Taxonomic classifier (created 2025-05-14)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::gtdbtk=2.4.1
+#
+# bakta: Prokaryotic annotater (created 2025-08-04)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::bakta=1.11.3
+#
+# checkm2: Completeness and contamination (created 2025-03-14)
+# channels:
+# - conda-forge
+# - bioconda
+# dependencies:
+# - bioconda::checkm2=1.1.0
+#########################################################################
+```
 
 ## Support
 For questions and support:
