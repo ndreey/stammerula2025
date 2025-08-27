@@ -15,7 +15,7 @@ The pipeline consists of several key stages:
 5. **MAG Assessment** - Annotation, taxonomic classification and MAG quality.
 
 ## Pipeline Architecture
-
+_flowchart is in progress_
 ```mermaid
 flowchart TD
     %% Input Data Sources
