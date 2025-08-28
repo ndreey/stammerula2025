@@ -10,7 +10,7 @@ The pipeline consists of several key stages:
 
 1. **Quality Control & Trimming**  - Verifies and validates after each step.
 2. **Decontamination** - Competitive mapping
-3.  **Assembly** - Hybrid assembly using both short and long reads
+3.  **Assembly** - Long and short read assembly
 4. **Binning** - Metagenomic binning and bin refinement
 5. **MAG Assessment** - Annotation, taxonomic classification and MAG quality.
 
