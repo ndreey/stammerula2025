@@ -19,7 +19,7 @@ The pipeline consists of several key stages:
 ![workflow](https://github.com/ndreey/stammerula2025/blob/main/doc/Untitled%20diagram%20_%20Mermaid%20Chart-2025-08-28-153745.png?raw=true)
 
 
-
+Detailed DAG figure can be found at end of document.
 ## Quick Start
 
 1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=23.04.0`)
@@ -220,6 +220,7 @@ For questions and support:
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+![DAG](https://github.com/ndreey/stammerula2025/blob/main/doc/DAG_viz.png?raw=true)
 ---
 
 
