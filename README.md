@@ -19,6 +19,66 @@ _pipeline v1.0 complete, flowchart, not so complete._
 So here is tree structure of the results folder.
 
 FLOWCHART IS IN PROGRESS
+```
+```mermaid
+flowchart TD
+    %% Input Data
+    A[Short Reads<br/>Illumina FASTQ] --> B[Quality Control & Trimming]
+    A1[Long Reads<br/>PacBio HiFi FASTQ] --> C1[Long Read Decontamination]
+    A2[Reference Genome<br/>Competitive Mapping] --> C[Short Read Decontamination]
+    A2 --> C1
+    
+    %% Quality Control and Preprocessing
+    B --> C[Short Read Decontamination]
+    
+    %% Merging Steps
+    C --> D[Merge by Sample]
+    C --> E[Merge by Population]
+    
+    %% Quality Control Reports
+    A --> F[QC Reports & Statistics]
+    A1 --> F
+    B --> F
+    C --> F
+    C1 --> F
+    D --> F
+    E --> F
+    
+    %% Assembly
+    E --> G[Short Read Assembly<br/>MEGAHIT]
+    C1 --> H[Long Read Assembly<br/>MetaMDBG]
+    
+    %% Binning
+    G --> I[Metagenomic Binning<br/>MetaWRAP]
+    H --> I
+    E --> I
+    
+    %% Quality Assessment
+    I --> J[Bin Quality Assessment]
+    J --> K[Annotation<br/>Bakta]
+    J --> L[Completeness<br/>CheckM2 & BUSCO]
+    J --> M[Taxonomy<br/>GTDB-Tk]
+    
+    %% Final Output
+    K --> N[High-Quality MAGs<br/>Metagenome Assembled Genomes]
+    L --> N
+    M --> N
+    
+    %% Styling
+    classDef input fill:#e1f5fe
+    classDef process fill:#f3e5f5
+    classDef assembly fill:#e8f5e8
+    classDef quality fill:#fff3e0
+    classDef output fill:#ffebee
+    
+    class A,A1,A2 input
+    class B,C,C1,D,E,F process
+    class G,H,I assembly
+    class J,K,L,M quality
+    class N output
+```
+```
+
 
 ```bash
 tree -L 3 -d results/
